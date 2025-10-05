@@ -1,0 +1,12 @@
+* Itineraries :
+** Sample : Habana->  Viñales ...
+** Habana->  Vinales->  Soroa->  Playa Larga->  Cienfuegos->  Trinidad->  Havana
+
+* Inspiration : https://www.responsibletravel.com/
+
+
+cuba-map/
+├── cuba.svg          # Your base map
+├── locations.json    # City coordinates data
+├── map.js           # Marker logic
+└── index.html       # Container

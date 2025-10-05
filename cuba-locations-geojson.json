@@ -1,0 +1,83 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Habana",
+        "name_en": "Havana",
+        "type": "capital",
+        "population": 2130000
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-82.3666, 23.1136]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Viñales",
+        "type": "town",
+        "province": "Pinar del Río",
+        "notable": "tobacco valley, mogotes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-83.7167, 22.6167]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Soroa",
+        "type": "village",
+        "province": "Pinar del Río",
+        "notable": "orchid garden, waterfall"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-82.9667, 22.7833]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Playa Larga",
+        "type": "beach town",
+        "province": "Matanzas",
+        "notable": "Bay of Pigs, diving"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-81.2000, 22.2667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cienfuegos",
+        "type": "city",
+        "province": "Cienfuegos",
+        "notable": "Pearl of the South, UNESCO"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-80.4400, 22.1467]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Trinidad",
+        "type": "city",
+        "province": "Sancti Spíritus",
+        "notable": "colonial town, UNESCO"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.9847, 21.8022]
+      }
+    }
+  ]
+}
