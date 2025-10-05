@@ -36,5 +36,29 @@ The project uses two location data formats:
 1. **locations.json**: Pixel coordinates for SVG positioning
 2. **cuba-locations-geojson.json**: Standard GeoJSON with real coordinates and rich metadata (population, province, notable features)
 
+## Style Guide
+
+### Visual Design Principles
+- **Text labels with backgrounds**: Use semi-transparent white rectangles behind text for better readability
+- **Strategic label positioning**: Position city labels to avoid overlapping with route lines
+- **Dashed route lines**: Use `stroke-dasharray: "5,3"` for itinerary routes
+- **Midpoint arrows**: Place directional arrows at 50% along curved routes, oriented to follow curve tangent (arrowSize = 9px)
+- **Consistent colors**: Use `#555555` for routes and arrows, `#ff4444` for city markers
+
+### Route Arrow Implementation
+- Calculate curve midpoint using quadratic Bézier formula
+- Determine arrow orientation by calculating tangent angle at midpoint
+- Position arrow as oriented polygon, not as path marker
+- Inspired by clean, professional map styling (reference: Sri Lanka map design)
+
+### Multi-Route Architecture
+- **Modular design**: Use `drawRoutes()` and `drawSingleRoute()` functions for reusability
+- **Curvature control**: Pass positive values for lower curves, negative for upper curves
+- **Route examples**:
+  - Habana → Viñales (curvature = -60, upper path)
+  - Viñales → Soroa (curvature = +60, lower path)
+- **Consistent styling**: All routes share same dashed pattern, arrow size, and colors
+- **Scalable approach**: Easy to add new route segments to complete itineraries
+
 ## Planned Features (from README.org)
 Sample itinerary routing: Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad → Havana
