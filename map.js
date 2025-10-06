@@ -129,11 +129,11 @@ function drawRoutes(svgDoc, svgElement, features) {
     drawSingleRoute(svgDoc, svgElement, habana, vinales, svgWidth, svgHeight, 15); // Subtle inland curve (south)
   }
 
-  // Route 2: Viñales to Soroa via lower path
+  // Route 2: Viñales to Soroa via upper path
   const soroa = features.find(f => f.properties.name === 'Soroa');
 
   if (vinales && soroa) {
-    drawSingleRoute(svgDoc, svgElement, vinales, soroa, svgWidth, svgHeight, 10); // Subtle inland curve (south)
+    drawSingleRoute(svgDoc, svgElement, vinales, soroa, svgWidth, svgHeight, -10); // Subtle inland curve (north)
   }
 }
 
