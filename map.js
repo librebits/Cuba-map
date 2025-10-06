@@ -126,14 +126,14 @@ function drawRoutes(svgDoc, svgElement, features) {
   const vinales = features.find(f => f.properties.name === 'Viñales');
 
   if (habana && vinales) {
-    drawSingleRoute(svgDoc, svgElement, habana, vinales, svgWidth, svgHeight, -60); // Upper curve
+    drawSingleRoute(svgDoc, svgElement, habana, vinales, svgWidth, svgHeight, 15); // Subtle inland curve (south)
   }
 
   // Route 2: Viñales to Soroa via lower path
   const soroa = features.find(f => f.properties.name === 'Soroa');
 
   if (vinales && soroa) {
-    drawSingleRoute(svgDoc, svgElement, vinales, soroa, svgWidth, svgHeight, 60); // Lower curve
+    drawSingleRoute(svgDoc, svgElement, vinales, soroa, svgWidth, svgHeight, 10); // Subtle inland curve (south)
   }
 }
 
@@ -158,12 +158,11 @@ function drawSingleRoute(svgDoc, svgElement, startCity, endCity, svgWidth, svgHe
   // Create full curved path connecting both cities
   const pathData = `M ${startPos.x} ${adjustedStartY} Q ${controlX} ${controlY} ${endPos.x} ${adjustedEndY}`;
 
-  // Create path element with dashed style
+  // Create path element with solid style
   const path = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'path');
   path.setAttribute('d', pathData);
   path.setAttribute('stroke', '#555555');
   path.setAttribute('stroke-width', '2');
-  path.setAttribute('stroke-dasharray', '5,3');  // Dashed line
   path.setAttribute('fill', 'none');
 
   // Calculate midpoint of curve for arrow placement

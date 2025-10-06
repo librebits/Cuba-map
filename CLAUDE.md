@@ -62,3 +62,4 @@ The project uses two location data formats:
 
 ## Planned Features (from README.org)
 Sample itinerary routing: Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad → Havana
+- change the Styling of the routes in the SVG map : not dashed but continuous lines. Add a very subtle curve.  Get inspiration in the ./Screeshots/indiaMap.gif
