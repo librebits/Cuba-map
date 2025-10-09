@@ -36,7 +36,7 @@ fetch('cuba-locations-geojson.json')
       const svgHeight = 760.622;
 
       // Cities to show markers for
-      const citiesToShow = ['Habana', 'Viñales', 'Soroa'];
+      const citiesToShow = ['Habana', 'Viñales', 'Soroa', 'Playa Larga'];
 
       data.features
         .filter(feature => citiesToShow.includes(feature.properties.name))
@@ -65,13 +65,19 @@ fetch('cuba-locations-geojson.json')
           let labelX = x;
           let labelY = adjustedY - 8;
 
-          // Reposition labels for better readability
+          // Reposition labels for better readability and avoid route overlap
           if (feature.properties.name === 'Viñales') {
             labelX = x - 20;  // Move left
             labelY = adjustedY + 20;  // Move below marker
           } else if (feature.properties.name === 'Habana') {
             labelX = x + 25;  // Move right to avoid arrow start
             labelY = adjustedY - 5;  // Slightly above marker
+          } else if (feature.properties.name === 'Soroa') {
+            labelX = x;  // Keep centered
+            labelY = adjustedY - 18;  // Move further above marker to avoid route path
+          } else if (feature.properties.name === 'Playa Larga') {
+            labelX = x + 30;  // Move right
+            labelY = adjustedY + 10;  // Move south into the sea
           }
 
           // Create background rectangle for text
@@ -135,6 +141,13 @@ function drawRoutes(svgDoc, svgElement, features) {
   if (vinales && soroa) {
     drawSingleRoute(svgDoc, svgElement, vinales, soroa, svgWidth, svgHeight, -10); // Subtle inland curve (north)
   }
+
+  // Route 3: Soroa to Playa Larga
+  const playaLarga = features.find(f => f.properties.name === 'Playa Larga');
+
+  if (soroa && playaLarga) {
+    drawSingleRoute(svgDoc, svgElement, soroa, playaLarga, svgWidth, svgHeight, -30); // Inland curve (north, away from sea)
+  }
 }
 
 // Function to draw a single curved route
@@ -149,14 +162,19 @@ function drawSingleRoute(svgDoc, svgElement, startCity, endCity, svgWidth, svgHe
   const adjustedStartY = startCity.properties.name === 'Habana' ? startPos.y + 5 : startPos.y;
   const adjustedEndY = endPos.y;
 
-  // Create curved path
-  const controlX = (startPos.x + endPos.x) / 2;
-  const controlY = curvature > 0 ?
-    Math.max(adjustedStartY, adjustedEndY) + curvature : // Lower curve
-    Math.min(adjustedStartY, adjustedEndY) + curvature;  // Upper curve
+  // Create cubic Bézier curve with two control points
+  const control1X = startPos.x + (endPos.x - startPos.x) * 0.33;
+  const control2X = startPos.x + (endPos.x - startPos.x) * 0.67;
 
-  // Create full curved path connecting both cities
-  const pathData = `M ${startPos.x} ${adjustedStartY} Q ${controlX} ${controlY} ${endPos.x} ${adjustedEndY}`;
+  const baseY = curvature > 0 ?
+    Math.max(adjustedStartY, adjustedEndY) : // Lower curve
+    Math.min(adjustedStartY, adjustedEndY);  // Upper curve
+
+  const control1Y = baseY + curvature * 0.8;
+  const control2Y = baseY + curvature * 0.8;
+
+  // Create full curved path connecting both cities using cubic Bézier
+  const pathData = `M ${startPos.x} ${adjustedStartY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endPos.x} ${adjustedEndY}`;
 
   // Create path element with solid style
   const path = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -165,19 +183,19 @@ function drawSingleRoute(svgDoc, svgElement, startCity, endCity, svgWidth, svgHe
   path.setAttribute('stroke-width', '2');
   path.setAttribute('fill', 'none');
 
-  // Calculate midpoint of curve for arrow placement
+  // Calculate midpoint of cubic Bézier curve for arrow placement
   const t = 0.5; // Midpoint of the curve
-  const midX = (1-t)*(1-t)*startPos.x + 2*(1-t)*t*controlX + t*t*endPos.x;
-  const midY = (1-t)*(1-t)*adjustedStartY + 2*(1-t)*t*controlY + t*t*adjustedEndY;
+  const midX = Math.pow(1-t,3)*startPos.x + 3*Math.pow(1-t,2)*t*control1X + 3*(1-t)*Math.pow(t,2)*control2X + Math.pow(t,3)*endPos.x;
+  const midY = Math.pow(1-t,3)*adjustedStartY + 3*Math.pow(1-t,2)*t*control1Y + 3*(1-t)*Math.pow(t,2)*control2Y + Math.pow(t,3)*adjustedEndY;
 
   // Calculate tangent direction at midpoint for proper arrow orientation
   const dt = 0.01;
   const t1 = t - dt;
   const t2 = t + dt;
-  const x1 = (1-t1)*(1-t1)*startPos.x + 2*(1-t1)*t1*controlX + t1*t1*endPos.x;
-  const y1 = (1-t1)*(1-t1)*adjustedStartY + 2*(1-t1)*t1*controlY + t1*t1*adjustedEndY;
-  const x2 = (1-t2)*(1-t2)*startPos.x + 2*(1-t2)*t2*controlX + t2*t2*endPos.x;
-  const y2 = (1-t2)*(1-t2)*adjustedStartY + 2*(1-t2)*t2*controlY + t2*t2*adjustedEndY;
+  const x1 = Math.pow(1-t1,3)*startPos.x + 3*Math.pow(1-t1,2)*t1*control1X + 3*(1-t1)*Math.pow(t1,2)*control2X + Math.pow(t1,3)*endPos.x;
+  const y1 = Math.pow(1-t1,3)*adjustedStartY + 3*Math.pow(1-t1,2)*t1*control1Y + 3*(1-t1)*Math.pow(t1,2)*control2Y + Math.pow(t1,3)*adjustedEndY;
+  const x2 = Math.pow(1-t2,3)*startPos.x + 3*Math.pow(1-t2,2)*t2*control1X + 3*(1-t2)*Math.pow(t2,2)*control2X + Math.pow(t2,3)*endPos.x;
+  const y2 = Math.pow(1-t2,3)*adjustedStartY + 3*Math.pow(1-t2,2)*t2*control1Y + 3*(1-t2)*Math.pow(t2,2)*control2Y + Math.pow(t2,3)*adjustedEndY;
 
   // Calculate angle for arrow orientation
   const angle = Math.atan2(y2 - y1, x2 - x1);

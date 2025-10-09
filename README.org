@@ -7,6 +7,6 @@
 
 cuba-map/
 ├── cuba.svg          # Your base map
-├── locations.json    # City coordinates data
+├── cuba-locations-geojson.json    # City coordinates data - itinerary
 ├── map.js           # Marker logic
 └── index.html       # Container
