@@ -53,8 +53,19 @@ window.addEventListener('DOMContentLoaded', () => {
         const endPos = latLngToSVG(endLat, endLng, svgWidth, svgHeight);
 
         // Adjust positions same as markers
-        const adjustedStartY = startCity.properties.name === 'Habana' ? startPos.y + 5 : startPos.y;
-        const adjustedEndY = endPos.y;
+        let adjustedStartY = startPos.y;
+        if (startCity.properties.name === 'Habana') {
+          adjustedStartY = startPos.y + 5;
+        } else if (startCity.properties.name === 'Trinidad') {
+          adjustedStartY = startPos.y - 25;
+        }
+
+        let adjustedEndY = endPos.y;
+        if (endCity.properties.name === 'Habana') {
+          adjustedEndY = endPos.y + 5;
+        } else if (endCity.properties.name === 'Trinidad') {
+          adjustedEndY = endPos.y - 25;
+        }
 
         // Create cubic Bézier curve with two control points
         const control1X = startPos.x + (endPos.x - startPos.x) * 0.33;
@@ -145,6 +156,13 @@ window.addEventListener('DOMContentLoaded', () => {
         if (playaLarga && cienfuegos) {
           drawSingleRoute(svgDoc, svgElement, playaLarga, cienfuegos, svgWidth, svgHeight, -20); // Inland curve (north, away from sea)
         }
+
+        // Route 5: Cienfuegos to Trinidad
+        const trinidad = features.find(f => f.properties.name === 'Trinidad');
+
+        if (cienfuegos && trinidad) {
+          drawSingleRoute(svgDoc, svgElement, cienfuegos, trinidad, svgWidth, svgHeight, -3); // Very soft curve, almost straight
+        }
       }
 
       // Load GeoJSON data and add markers
@@ -195,16 +213,16 @@ window.addEventListener('DOMContentLoaded', () => {
                 labelY = adjustedY - 5;
               } else if (feature.properties.name === 'Soroa') {
                 labelX = x;
-                labelY = adjustedY - 18;
+                labelY = adjustedY - 13;  // 5px south from previous position
               } else if (feature.properties.name === 'Playa Larga') {
                 labelX = x + 30;
                 labelY = adjustedY + 10;
               } else if (feature.properties.name === 'Cienfuegos') {
-                labelX = x;
-                labelY = adjustedY + 18;  // Below marker to avoid route overlap
+                labelX = x - 20;  // 5px more west
+                labelY = adjustedY + 18;  // 5px north from previous position
               } else if (feature.properties.name === 'Trinidad') {
                 labelX = x;
-                labelY = adjustedY - 18;  // Above marker
+                labelY = adjustedY + 22;  // 10px more south
               }
 
               // Create background rectangle for text
