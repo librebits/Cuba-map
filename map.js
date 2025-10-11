@@ -3,6 +3,27 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const mapObject = document.getElementById('cuba-map');
 
+    // Export function: download complete SVG with markers and routes
+    const exportSVG = (svgDoc) => {
+      const svgElement = svgDoc.querySelector('svg');
+
+      // Serialize to string
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svgElement);
+
+      // Create blob and download
+      const blob = new Blob([svgString], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'cuba-map-with-itinerary.svg';
+      link.click();
+
+      // Cleanup
+      URL.revokeObjectURL(url);
+    };
+
     // Function to initialize markers and routes
     const initializeMap = () => {
       const svgDoc = mapObject.contentDocument;
@@ -345,6 +366,11 @@ window.addEventListener('DOMContentLoaded', () => {
           // Draw curved routes
           console.log('Drawing routes...');
           drawRoutes(svgDoc, svgElement, data.features);
+
+          // Wire export button
+          document.getElementById('export-btn').addEventListener('click', () => {
+            exportSVG(svgDoc);
+          });
         })
         .catch(error => console.error('Error loading GeoJSON:', error));
     };
