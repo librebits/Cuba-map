@@ -138,6 +138,13 @@ window.addEventListener('DOMContentLoaded', () => {
         if (soroa && playaLarga) {
           drawSingleRoute(svgDoc, svgElement, soroa, playaLarga, svgWidth, svgHeight, -30); // Inland curve (north, away from sea)
         }
+
+        // Route 4: Playa Larga to Cienfuegos
+        const cienfuegos = features.find(f => f.properties.name === 'Cienfuegos');
+
+        if (playaLarga && cienfuegos) {
+          drawSingleRoute(svgDoc, svgElement, playaLarga, cienfuegos, svgWidth, svgHeight, -20); // Inland curve (north, away from sea)
+        }
       }
 
       // Load GeoJSON data and add markers
@@ -145,7 +152,7 @@ window.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
           // Cities to show markers for
-          const citiesToShow = ['Habana', 'Viñales', 'Soroa', 'Playa Larga'];
+          const citiesToShow = ['Habana', 'Viñales', 'Soroa', 'Playa Larga', 'Cienfuegos'];
 
           data.features
             .filter(feature => citiesToShow.includes(feature.properties.name))
@@ -187,6 +194,9 @@ window.addEventListener('DOMContentLoaded', () => {
               } else if (feature.properties.name === 'Playa Larga') {
                 labelX = x + 30;
                 labelY = adjustedY + 10;
+              } else if (feature.properties.name === 'Cienfuegos') {
+                labelX = x;
+                labelY = adjustedY + 18;  // Below marker to avoid route overlap
               }
 
               // Create background rectangle for text
