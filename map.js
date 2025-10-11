@@ -152,7 +152,7 @@ window.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
           // Cities to show markers for
-          const citiesToShow = ['Habana', 'Viñales', 'Soroa', 'Playa Larga', 'Cienfuegos'];
+          const citiesToShow = ['Habana', 'Viñales', 'Soroa', 'Playa Larga', 'Cienfuegos', 'Trinidad'];
 
           data.features
             .filter(feature => citiesToShow.includes(feature.properties.name))
@@ -163,8 +163,13 @@ window.addEventListener('DOMContentLoaded', () => {
               // Create marker circle
               const marker = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
 
-              // Adjust Habana position slightly south
-              const adjustedY = feature.properties.name === 'Habana' ? y + 5 : y;
+              // Adjust positions for specific cities
+              let adjustedY = y;
+              if (feature.properties.name === 'Habana') {
+                adjustedY = y + 5;  // Move south
+              } else if (feature.properties.name === 'Trinidad') {
+                adjustedY = y - 25;  // Move north (10 + 15 more)
+              }
 
               marker.setAttribute('cx', x);
               marker.setAttribute('cy', adjustedY);
@@ -197,6 +202,9 @@ window.addEventListener('DOMContentLoaded', () => {
               } else if (feature.properties.name === 'Cienfuegos') {
                 labelX = x;
                 labelY = adjustedY + 18;  // Below marker to avoid route overlap
+              } else if (feature.properties.name === 'Trinidad') {
+                labelX = x;
+                labelY = adjustedY - 18;  // Above marker
               }
 
               // Create background rectangle for text
