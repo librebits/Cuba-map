@@ -161,7 +161,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const trinidad = features.find(f => f.properties.name === 'Trinidad');
 
         if (cienfuegos && trinidad) {
-          drawSingleRoute(svgDoc, svgElement, cienfuegos, trinidad, svgWidth, svgHeight, -3); // Very soft curve, almost straight
+          drawSingleRoute(svgDoc, svgElement, cienfuegos, trinidad, svgWidth, svgHeight, 0); // Perfect straight line, no curve
         }
       }
 
