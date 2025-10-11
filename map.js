@@ -163,6 +163,11 @@ window.addEventListener('DOMContentLoaded', () => {
         if (cienfuegos && trinidad) {
           drawSingleRoute(svgDoc, svgElement, cienfuegos, trinidad, svgWidth, svgHeight, 0); // Perfect straight line, no curve
         }
+
+        // Route 6: Trinidad to Habana (closing the loop, inland route)
+        if (trinidad && habana) {
+          drawSingleRoute(svgDoc, svgElement, trinidad, habana, svgWidth, svgHeight, -1); // Almost straight line through center of island
+        }
       }
 
       // Load GeoJSON data and add markers
