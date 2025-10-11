@@ -60,6 +60,42 @@ The project uses two location data formats:
 - **Consistent styling**: All routes share same dashed pattern, arrow size, and colors
 - **Scalable approach**: Easy to add new route segments to complete itineraries
 
+### S-Curve (Smooth Inflection) Bézier Routes
+
+For routes requiring smooth S-shaped curves with inflection points (e.g., long-distance routes that need to avoid overlaps):
+
+**Key Principles:**
+- Use cubic Bézier curves with **asymmetrically positioned control points**
+- Position control points at different percentages (e.g., 25% and 75%) for natural S-shape
+- Create inflection by pulling control points in **opposite relative directions**
+
+**Control Point Strategy:**
+```javascript
+// Example: Trinidad → Habana S-curve avoiding other routes
+control1X = startX + (endX - startX) * 0.25  // Earlier control point
+control2X = startX + (endX - startX) * 0.75  // Later control point
+
+control1Y = startY - 60  // Pull strongly north at start
+control2Y = endY - 15    // Continue north toward end
+```
+
+**Avoiding Overlaps:**
+1. **Analyze the map**: Identify which routes/markers need to be avoided
+2. **Adjust control point 1**: Pull aggressively away from obstacles at the start
+3. **Adjust control point 2**: Maintain inland trajectory while approaching destination
+4. **Iterate**: Increase offset values (e.g., -30 → -60) until route clears all overlaps
+
+**Staying Inland:**
+- Negative Y values pull north (inland for southern coastal cities)
+- Positive Y values pull south (inland for northern coastal cities)
+- Test with viewBox showing full island boundaries
+- Ensure route doesn't exceed Cuba's coastlines
+
+**Real Example (Trinidad → Habana):**
+- Control point 1: -60px north (avoids Cienfuegos → Trinidad straight line)
+- Control point 2: -15px north (continues through central Cuba)
+- Result: Smooth S-curve staying inland, no overlaps
+
 ## Planned Features (from README.org)
 Sample itinerary routing: Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad → Havana
 - change the Styling of the routes in the SVG map : not dashed but continuous lines. Add a very subtle curve.  Get inspiration in the ./Screeshots/indiaMap.gif
