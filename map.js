@@ -334,7 +334,8 @@ window.addEventListener('DOMContentLoaded', () => {
               textBg.setAttribute('y', labelY - 12);
               textBg.setAttribute('width', textWidth + 4);
               textBg.setAttribute('height', 16);
-              textBg.setAttribute('fill', 'rgba(255, 255, 255, 0.8)');
+              textBg.setAttribute('fill', '#ffffff');
+              textBg.setAttribute('fill-opacity', '0.8');
               textBg.setAttribute('stroke', '#333333');
               textBg.setAttribute('stroke-width', '0.5');
               textBg.setAttribute('rx', '3');
