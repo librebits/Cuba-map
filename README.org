@@ -1,6 +1,23 @@
 * Itineraries :
 ** Sample : Habana->  Viñales ...
-** Habana->  Vinales->  Soroa->  Playa Larga->  Cienfuegos->  Trinidad->  Havana
+** CUBA1: Habana-> María la Gorda ->  Viñales->  Soroa->  Playa Larga->  Cienfuegos->  Trinidad->  Havana
+** CUBA2:
+​habana
+viñales
+...
+trinidad
+camaguey
+santiago
+baracoa
+santiago de cuba
+habana
+
+
+
+
+3 Cuba 
+11 x country
+
 
 * Inspiration : https://www.responsibletravel.com/
 
