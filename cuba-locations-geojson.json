@@ -78,6 +78,19 @@
         "type": "Point",
         "coordinates": [-79.9847, 21.8022]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "María la Gorda",
+        "type": "beach resort",
+        "province": "Pinar del Río",
+        "notable": "diving, Guanahacabibes Peninsula"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-84.50, 21.95]
+      }
     }
   ]
 }

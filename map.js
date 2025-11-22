@@ -147,6 +147,83 @@ window.addEventListener('DOMContentLoaded', () => {
         svgElement.appendChild(arrowhead);
       }
 
+      // Function to draw bidirectional route (two arrows on same path, pointing in opposite directions)
+      function drawBidirectionalRoute(svgDoc, svgElement, city1, city2, svgWidth, svgHeight, curvature) {
+        const [lng1, lat1] = city1.geometry.coordinates;
+        const [lng2, lat2] = city2.geometry.coordinates;
+
+        const pos1 = latLngToSVG(lat1, lng1, svgWidth, svgHeight);
+        const pos2 = latLngToSVG(lat2, lng2, svgWidth, svgHeight);
+
+        let adjustedY1 = pos1.y;
+        let adjustedY2 = pos2.y;
+
+        // Calculate single control point for quadratic Bézier (simplest curve)
+        const controlX = (pos1.x + pos2.x) / 2;
+        const midY = (adjustedY1 + adjustedY2) / 2;
+        const controlY = midY + curvature;
+
+        // Create quadratic Bézier path (simpler than cubic - only 1 control point)
+        const pathData = `M ${pos1.x} ${adjustedY1} Q ${controlX} ${controlY}, ${pos2.x} ${adjustedY2}`;
+
+        // Create path element
+        const path = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathData);
+        path.setAttribute('stroke', '#555555');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', 'none');
+
+        // Helper function to calculate point and angle at parameter t on quadratic Bézier
+        const calcPointAndAngle = (t) => {
+          // Quadratic Bézier formula: B(t) = (1-t)²P₀ + 2(1-t)tP₁ + t²P₂
+          const x = Math.pow(1-t, 2) * pos1.x + 2 * (1-t) * t * controlX + Math.pow(t, 2) * pos2.x;
+          const y = Math.pow(1-t, 2) * adjustedY1 + 2 * (1-t) * t * controlY + Math.pow(t, 2) * adjustedY2;
+
+          // Calculate tangent direction
+          const dt = 0.01;
+          const t1 = t - dt;
+          const t2 = t + dt;
+          const x1 = Math.pow(1-t1, 2) * pos1.x + 2 * (1-t1) * t1 * controlX + Math.pow(t1, 2) * pos2.x;
+          const y1 = Math.pow(1-t1, 2) * adjustedY1 + 2 * (1-t1) * t1 * controlY + Math.pow(t1, 2) * adjustedY2;
+          const x2 = Math.pow(1-t2, 2) * pos1.x + 2 * (1-t2) * t2 * controlX + Math.pow(t2, 2) * pos2.x;
+          const y2 = Math.pow(1-t2, 2) * adjustedY1 + 2 * (1-t2) * t2 * controlY + Math.pow(t2, 2) * adjustedY2;
+
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+
+          return { x, y, angle };
+        };
+
+        // Create arrow helper function
+        const arrowSize = 9;
+        const createArrow = (point, reverse) => {
+          // Reverse angle by 180° for opposite direction
+          const angle = reverse ? point.angle + Math.PI : point.angle;
+          const cos = Math.cos(angle);
+          const sin = Math.sin(angle);
+
+          const arrowhead = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+          const p1x = point.x + arrowSize * cos;
+          const p1y = point.y + arrowSize * sin;
+          const p2x = point.x - arrowSize/2 * cos + arrowSize/2 * sin;
+          const p2y = point.y - arrowSize/2 * sin - arrowSize/2 * cos;
+          const p3x = point.x - arrowSize/2 * cos - arrowSize/2 * sin;
+          const p3y = point.y - arrowSize/2 * sin + arrowSize/2 * cos;
+
+          arrowhead.setAttribute('points', `${p1x},${p1y} ${p2x},${p2y} ${p3x},${p3y}`);
+          arrowhead.setAttribute('fill', '#555555');
+          return arrowhead;
+        };
+
+        // Create two arrows at 35% and 65%, pointing in opposite directions
+        const arrow1Point = calcPointAndAngle(0.35);
+        const arrow2Point = calcPointAndAngle(0.65);
+
+        // Add path and both arrowheads (reversed from before)
+        svgElement.appendChild(path);
+        svgElement.appendChild(createArrow(arrow1Point, true));  // Reverse: María la Gorda → Viñales
+        svgElement.appendChild(createArrow(arrow2Point, false)); // Forward: Viñales → María la Gorda
+      }
+
       // Function to draw S-curve route for Trinidad to Habana
       function drawSCurveRoute(svgDoc, svgElement, startCity, endCity, svgWidth, svgHeight) {
         const [startLng, startLat] = startCity.geometry.coordinates;
@@ -233,6 +310,13 @@ window.addEventListener('DOMContentLoaded', () => {
           drawSingleRoute(svgDoc, svgElement, habana, vinales, svgWidth, svgHeight, 15); // Subtle inland curve (south)
         }
 
+        // Bidirectional route: Viñales ↔ María la Gorda
+        const mariaLaGorda = features.find(f => f.properties.name === 'María la Gorda');
+
+        if (vinales && mariaLaGorda) {
+          drawBidirectionalRoute(svgDoc, svgElement, vinales, mariaLaGorda, svgWidth, svgHeight, 35); // Moderate inland curve to avoid water
+        }
+
         // Route 2: Viñales to Soroa
         const soroa = features.find(f => f.properties.name === 'Soroa');
 
@@ -272,7 +356,7 @@ window.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
           // Cities to show markers for
-          const citiesToShow = ['Habana', 'Viñales', 'Soroa', 'Playa Larga', 'Cienfuegos', 'Trinidad'];
+          const citiesToShow = ['Habana', 'Viñales', 'María la Gorda', 'Soroa', 'Playa Larga', 'Cienfuegos', 'Trinidad'];
 
           data.features
             .filter(feature => citiesToShow.includes(feature.properties.name))
@@ -308,11 +392,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
               // Reposition labels for better readability and avoid route overlap
               if (feature.properties.name === 'Viñales') {
-                labelX = x - 20;
-                labelY = adjustedY + 20;
+                labelX = x - 30;
+                labelY = adjustedY - 5;  // Above marker to avoid route overlap
               } else if (feature.properties.name === 'Habana') {
                 labelX = x + 25;
                 labelY = adjustedY - 5;
+              } else if (feature.properties.name === 'María la Gorda') {
+                labelX = x;
+                labelY = adjustedY + 20;
               } else if (feature.properties.name === 'Soroa') {
                 labelX = x;
                 labelY = adjustedY - 13;  // 5px south from previous position

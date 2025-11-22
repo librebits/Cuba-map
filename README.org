@@ -1,10 +1,10 @@
 * Itineraries :
 ** Sample : Habana->  Viñales ...
 ** CUBA1: Habana-> María la Gorda ->  Viñales->  Soroa->  Playa Larga->  Cienfuegos->  Trinidad->  Havana
-** CUBA2:
+** CUBA2: milestones are ... 
 ​habana
 viñales
-...
+
 trinidad
 camaguey
 santiago
