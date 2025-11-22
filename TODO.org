@@ -1,1 +1,42 @@
-* Create second Itinerary MAP - Cuba2 
+* Create second Itinerary MAP - Cuba2
+See itinerary details: [[file:README.org::*CUBA2]]
+
+** DONE [0] Keep existing western route, remove Trinidad → Habana loop
+Marcel's requirement: Keep Viñales, Soroa, Playa Larga, Trinidad route intact,
+but remove the S-curve closing loop from Trinidad back to Habana.
+
+Action plan:
+- [X] Locate drawSCurveRoute() call for Trinidad → Habana in map.js (map.js:348-352)
+- [X] Comment out or remove the Trinidad → Habana S-curve route
+- [X] Verify María la Gorda ↔ Viñales bidirectional route remains
+- [X] Test that western route stops at Trinidad (Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad)
+- [X] Ensure all existing city markers remain visible
+
+Status: Completed. Trinidad → Habana loop removed. Route now ends at Trinidad.
+
+** TODO Add 5 new cities to cuba-locations-geojson.json
+- [ ] Camagüey
+- [ ] Santiago de Cuba
+- [ ] Baracoa
+- [ ] Faro de Maisi (extreme east point)
+- [ ] Yumurí
+
+** TODO Remove Trinidad → Habana closing loop from CUBA1 routes
+
+** TODO Add eastern extension routes
+- [ ] Trinidad → Camagüey
+- [ ] Camagüey → Santiago de Cuba
+- [ ] Santiago de Cuba → Baracoa
+- [ ] Baracoa ↔ Santiago de Cuba (bidirectional with double arrows)
+- [ ] Santiago de Cuba → Habana (straight nightbus line)
+
+** TODO Optional: Add eastern circular loop (anti-clockwise)
+- [ ] Baracoa → Faro de Maisi (south)
+- [ ] Faro de Maisi → Yumurí
+- [ ] Yumurí → Baracoa (completing the loop)
+
+** TODO Test all routes stay 100% inland
+Especially check the long Santiago de Cuba → Habana nightbus route
+
+** TODO Update export functionality
+Ensure SVG export works correctly with all new routes and cities 

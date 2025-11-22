@@ -345,10 +345,11 @@ window.addEventListener('DOMContentLoaded', () => {
           drawSingleRoute(svgDoc, svgElement, cienfuegos, trinidad, svgWidth, svgHeight, 0); // Perfect straight line, no curve
         }
 
-        // Route 6: Trinidad to Habana (closing the loop, inland route) - S-curve
-        if (trinidad && habana) {
-          drawSCurveRoute(svgDoc, svgElement, trinidad, habana, svgWidth, svgHeight);
-        }
+        // Route 6: Trinidad to Habana - REMOVED per Marcel's CUBA2 requirements
+        // Western route now ends at Trinidad, ready for eastern extension
+        // if (trinidad && habana) {
+        //   drawSCurveRoute(svgDoc, svgElement, trinidad, habana, svgWidth, svgHeight);
+        // }
       }
 
       // Load GeoJSON data and add markers
