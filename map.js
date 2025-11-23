@@ -220,8 +220,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // Add path and both arrowheads (reversed from before)
         svgElement.appendChild(path);
-        svgElement.appendChild(createArrow(arrow1Point, true));  // Reverse: María la Gorda → Viñales
-        svgElement.appendChild(createArrow(arrow2Point, false)); // Forward: Viñales → María la Gorda
+        svgElement.appendChild(createArrow(arrow1Point, true));  // Reverse direction
+        svgElement.appendChild(createArrow(arrow2Point, false)); // Forward direction
       }
 
       // Function to draw S-curve route for Trinidad to Habana
@@ -310,12 +310,7 @@ window.addEventListener('DOMContentLoaded', () => {
           drawSingleRoute(svgDoc, svgElement, habana, vinales, svgWidth, svgHeight, 15); // Subtle inland curve (south)
         }
 
-        // Bidirectional route: Viñales ↔ María la Gorda
-        const mariaLaGorda = features.find(f => f.properties.name === 'María la Gorda');
-
-        if (vinales && mariaLaGorda) {
-          drawBidirectionalRoute(svgDoc, svgElement, vinales, mariaLaGorda, svgWidth, svgHeight, 35); // Moderate inland curve to avoid water
-        }
+        // María la Gorda route REMOVED per Marcel's request
 
         // Route 2: Viñales to Soroa
         const soroa = features.find(f => f.properties.name === 'Soroa');
@@ -356,8 +351,8 @@ window.addEventListener('DOMContentLoaded', () => {
       fetch('cuba-locations-geojson.json')
         .then(response => response.json())
         .then(data => {
-          // Cities to show markers for
-          const citiesToShow = ['Habana', 'Viñales', 'María la Gorda', 'Soroa', 'Playa Larga', 'Cienfuegos', 'Trinidad'];
+          // Cities to show markers for (NO María la Gorda per Marcel's request)
+          const citiesToShow = ['Habana', 'Viñales', 'Soroa', 'Playa Larga', 'Cienfuegos', 'Trinidad'];
 
           data.features
             .filter(feature => citiesToShow.includes(feature.properties.name))
@@ -398,9 +393,6 @@ window.addEventListener('DOMContentLoaded', () => {
               } else if (feature.properties.name === 'Habana') {
                 labelX = x + 25;
                 labelY = adjustedY - 5;
-              } else if (feature.properties.name === 'María la Gorda') {
-                labelX = x;
-                labelY = adjustedY + 20;
               } else if (feature.properties.name === 'Soroa') {
                 labelX = x;
                 labelY = adjustedY - 13;  // 5px south from previous position
