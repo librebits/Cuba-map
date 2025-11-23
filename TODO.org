@@ -1,4 +1,7 @@
-* Create second Itinerary MAP - Cuba2
+* TODO Refactor first Itinerary MAP - Cuba1 :
+ ... without Maria La Gorda itinerary
+
+* PROCESS Create second Itinerary MAP - Cuba2
 See itinerary details: [[file:README.org::*CUBA2]]
 
 ** DONE [0] Keep existing western route, remove Trinidad → Habana loop
@@ -14,29 +17,59 @@ Action plan:
 
 Status: Completed. Trinidad → Habana loop removed. Route now ends at Trinidad.
 
-** TODO Add 5 new cities to cuba-locations-geojson.json
-- [ ] Camagüey
-- [ ] Santiago de Cuba
-- [ ] Baracoa
-- [ ] Faro de Maisi (extreme east point)
-- [ ] Yumurí
+** DONE Add 5 new cities to cuba-locations-geojson.json
+- [X] Camagüey (21.38°N, -77.92°W)
+- [X] Santiago de Cuba (20.0247°N, -75.8219°W)
+- [X] Baracoa (20.3475°N, -74.5024°W)
+- [X] Faro de Maisi (20.2089°N, -74.1336°W - extreme east point)
+- [X] Yumurí / Boca de Yumurí (20.3009°N, -74.2976°W)
 
-** TODO Remove Trinidad → Habana closing loop from CUBA1 routes
+** DONE Add eastern extension routes
+- [X] Trinidad → Camagüey (map.js:384-386)
+- [X] Camagüey → Santiago de Cuba (map.js:388-390)
+- [X] Santiago de Cuba → Baracoa (map.js:392-394)
+- [X] Baracoa ↔ Santiago de Cuba (bidirectional with double arrows) (map.js:396-399)
+- [X] Santiago de Cuba → Habana (straight nightbus line) (map.js:401-404)
+- [X] Add Camagüey and Santiago de Cuba to CUBA2 cities list (map.js:432)
+- [X] Add label positioning for new cities (map.js:491-496)
 
-** TODO Add eastern extension routes
-- [ ] Trinidad → Camagüey
-- [ ] Camagüey → Santiago de Cuba
-- [ ] Santiago de Cuba → Baracoa
-- [ ] Baracoa ↔ Santiago de Cuba (bidirectional with double arrows)
-- [ ] Santiago de Cuba → Habana (straight nightbus line)
+** DONE Optional: Add eastern circular loop (anti-clockwise)
+- [X] Baracoa → Faro de Maisi (south)
+- [X] Faro de Maisi → Yumurí
+- [X] Yumurí → Baracoa (completing the loop)
 
-** TODO Optional: Add eastern circular loop (anti-clockwise)
-- [ ] Baracoa → Faro de Maisi (south)
-- [ ] Faro de Maisi → Yumurí
-- [ ] Yumurí → Baracoa (completing the loop)
+** DONE Add toggle functionality to switch between itineraries
+- [X] Add CUBA1 and CUBA2 toggle buttons to index.html
+- [X] Implement clearMap() function to remove routes/markers
+- [X] Modify initializeMap() to accept itinerary parameter
+- [X] Set cities to show based on itinerary (CUBA1 vs CUBA2)
+- [X] Conditionally draw eastern loop only for CUBA2
+- [X] Wire up toggle button click handlers
+- [X] Update export filename to include itinerary name
+
+** DONE Create separate files for CUBA2 (clean start from scratch)
+- [X] Create index2.html for CUBA2
+- [X] Create map2.js for CUBA2
+- [X] Add all 11 CUBA2 city markers (no routes yet)
+- [X] Reuse cuba.svg base map
+- [X] Export button wired to save as cuba-map2-west-to-east.svg
+
+** TODO Clarify CUBA2 itinerary with Marcel
+Questions to ask:
+- Does CUBA2 start from Habana or directly from Viñales? : START AT HABANA, THEN VINALES ETC
+- Should Cienfuegos be included (between Playa Larga and Trinidad)?: YES
+- Is María la Gorda bidirectional route in CUBA2 or only CUBA1? DO NOT include MARIA LA GORDA in any of the itineraries
+
+** TODO Add routes to CUBA2 once itinerary confirmed
+Based on Marcel's email (pending clarification):
+- Viñales → Soroa → Playa Larga → (Cienfuegos?) → Trinidad
+- Trinidad → Camagüey → Santiago de Cuba → Baracoa
+- Baracoa ↔ Santiago de Cuba (bidirectional)
+- Santiago de Cuba → Habana (straight nightbus)
+- Optional: Baracoa → Faro de Maisi → Yumurí → Baracoa (circular loop)
 
 ** TODO Test all routes stay 100% inland
 Especially check the long Santiago de Cuba → Habana nightbus route
 
-** TODO Update export functionality
+* WAIT Update export functionality (2nd priority )
 Ensure SVG export works correctly with all new routes and cities 

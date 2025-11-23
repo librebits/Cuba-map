@@ -1,16 +1,19 @@
-* Itineraries :
-** Sample : Habana->  Viñales ...
-** CUBA1: Habana-> María la Gorda ->  Viñales->  Soroa->  Playa Larga->  Cienfuegos->  Trinidad->  Havana
-** CUBA2: milestones are ... 
-​habana
-viñales
+* Itineraries
 
-trinidad
-camaguey
-santiago
-baracoa
-santiago de cuba
-habana
+** CUBA1 (Western Route)
+Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad
+
+*Note:* María la Gorda removed per Marcel's request. No loop back to Habana.
+
+** CUBA2 (West to East Cross-Country)
+Main route:
+- Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad
+- Trinidad → Camagüey → Santiago de Cuba → Baracoa
+- Baracoa ↔ Santiago de Cuba (bidirectional)
+- Santiago de Cuba → Habana (straight nightbus line)
+
+Optional eastern loop (anti-clockwise):
+- Baracoa → Faro de Maisi → Yumurí → Baracoa
 
 
 
@@ -22,8 +25,13 @@ habana
 * Inspiration : https://www.responsibletravel.com/
 
 
+* Project Structure
+
 cuba-map/
-├── cuba.svg          # Your base map
-├── cuba-locations-geojson.json    # City coordinates data - itinerary
-├── map.js           # Marker logic
-└── index.html       # Container
+├── cuba.svg                        # Base SVG map of Cuba
+├── cuba-locations-geojson.json     # City coordinates (GeoJSON format)
+├── index.html                      # CUBA1 (Western route)
+├── map.js                          # CUBA1 JavaScript logic
+├── index2.html                     # CUBA2 (West to East route)
+├── map2.js                         # CUBA2 JavaScript logic
+└── Maps/                           # Exported SVG maps
