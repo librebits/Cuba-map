@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuba Map - CUBA2 Markers Only</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1900px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    h1 {
+      color: #333;
+    }
+    .info {
+      background: #e8f4f8;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #0978AB;
+    }
+    #cuba-map {
+      width: 100%;
+      height: auto;
+      border: 2px solid #0978AB;
+      background: #C6ECFF;
+    }
+    button {
+      background: #0978AB;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 5px;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #075a7a;
+    }
+    .controls {
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cuba Map - CUBA2 (Markers Only)</h1>
+
+    <div class="info">
+      <strong>Purpose:</strong> This version shows ONLY city markers for CUBA2 itinerary, without any routes.
+      <br>
+      <strong>Goal:</strong> Verify that all cities (especially Santiago de Cuba and eastern cities) appear correctly on land.
+      <br>
+      <strong>Cities shown:</strong> Habana, Viñales, Soroa, Playa Larga, Cienfuegos, Trinidad, Camagüey, Santiago de Cuba, Baracoa, Faro de Maisi, Yumurí
+    </div>
+
+    <div class="controls">
+      <button id="export-btn">Export Map as SVG</button>
+    </div>
+
+    <object id="cuba-map" data="cuba.svg" type="image/svg+xml"></object>
+  </div>
+
+  <script type="module" src="./map2-markers-only.js"></script>
+</body>
+</html>

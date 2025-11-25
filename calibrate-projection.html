@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuba Map - Projection Calibration Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1900px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    h1 {
+      color: #333;
+    }
+    #cuba-map {
+      width: 100%;
+      height: auto;
+      border: 2px solid #0978AB;
+      background: #C6ECFF;
+    }
+    .controls {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f0f0f0;
+      border-radius: 5px;
+    }
+    .controls label {
+      display: inline-block;
+      width: 120px;
+      font-weight: bold;
+    }
+    .controls input {
+      width: 100px;
+      padding: 5px;
+      margin: 5px;
+    }
+    button {
+      background: #0978AB;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #075a7a;
+    }
+    #output {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e8f4f8;
+      border-left: 4px solid #0978AB;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cuba Map - Projection Calibration Tool</h1>
+    <p>Use this tool to calibrate CUBA_BOUNDS by testing reference cities. Adjust bounds until markers align with land.</p>
+
+    <div class="controls">
+      <h3>Cuba Bounds (degrees)</h3>
+      <div>
+        <label>North:</label>
+        <input type="number" id="north" value="23.4" step="0.1">
+      </div>
+      <div>
+        <label>South:</label>
+        <input type="number" id="south" value="19.6" step="0.1">
+      </div>
+      <div>
+        <label>West:</label>
+        <input type="number" id="west" value="-85.2" step="0.1">
+      </div>
+      <div>
+        <label>East:</label>
+        <input type="number" id="east" value="-73.8" step="0.1">
+      </div>
+      <h3>Offset (pixels)</h3>
+      <div>
+        <label>X Offset:</label>
+        <input type="number" id="offsetX" value="0" step="5">
+      </div>
+      <div>
+        <label>Y Offset:</label>
+        <input type="number" id="offsetY" value="40" step="5">
+      </div>
+      <div style="margin-top: 15px;">
+        <button onclick="updateMap()">Update Map</button>
+        <button onclick="resetDefaults()">Reset to Defaults</button>
+      </div>
+    </div>
+
+    <object id="cuba-map" data="cuba.svg" type="image/svg+xml"></object>
+
+    <div id="output"></div>
+  </div>
+
+  <script type="module">
+    const SVG_SIZE = {
+      width: 1795.312,
+      height: 760.622,
+    };
+
+    function latLngToSVG(lat, lng, bounds, offset) {
+      const x = ((lng - bounds.west) / (bounds.east - bounds.west)) * SVG_SIZE.width + offset.x;
+      const y = ((bounds.north - lat) / (bounds.north - bounds.south)) * SVG_SIZE.height + offset.y;
+      return { x, y };
+    }
+
+    const referenceCities = [
+      { name: 'Habana', lat: 23.1136, lng: -82.3666 },
+      { name: 'Santiago de Cuba', lat: 20.0247, lng: -75.8219 },
+      { name: 'Baracoa', lat: 20.3475, lng: -74.5024 },
+      { name: 'Faro de Maisi', lat: 20.2089, lng: -74.1336 },
+      { name: 'Viñales', lat: 22.6167, lng: -83.7167 },
+      { name: 'Trinidad', lat: 21.8022, lng: -79.9847 },
+    ];
+
+    window.updateMap = function() {
+      const mapObject = document.getElementById('cuba-map');
+      const svgDoc = mapObject.contentDocument;
+
+      if (!svgDoc) {
+        alert('SVG not loaded yet. Please wait and try again.');
+        return;
+      }
+
+      const svgElement = svgDoc.querySelector('svg');
+
+      // Remove previous markers
+      const oldMarkers = svgDoc.querySelectorAll('.calibration-marker, .calibration-label');
+      oldMarkers.forEach(m => m.remove());
+
+      // Get current bounds and offset from inputs
+      const bounds = {
+        north: parseFloat(document.getElementById('north').value),
+        south: parseFloat(document.getElementById('south').value),
+        west: parseFloat(document.getElementById('west').value),
+        east: parseFloat(document.getElementById('east').value),
+      };
+
+      const offset = {
+        x: parseFloat(document.getElementById('offsetX').value),
+        y: parseFloat(document.getElementById('offsetY').value),
+      };
+
+      let output = 'Calibration Results:\n\n';
+      output += `CUBA_BOUNDS = {\n`;
+      output += `  north: ${bounds.north},\n`;
+      output += `  south: ${bounds.south},\n`;
+      output += `  west: ${bounds.west},\n`;
+      output += `  east: ${bounds.east}\n};\n\n`;
+      output += `OFFSET = { x: ${offset.x}, y: ${offset.y} };\n\n`;
+      output += 'City Positions:\n';
+
+      referenceCities.forEach(city => {
+        const { x, y } = latLngToSVG(city.lat, city.lng, bounds, offset);
+
+        // Create marker
+        const marker = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        marker.setAttribute('cx', x);
+        marker.setAttribute('cy', y);
+        marker.setAttribute('r', '6');
+        marker.setAttribute('fill', '#ff0000');
+        marker.setAttribute('stroke', '#ffffff');
+        marker.setAttribute('stroke-width', '2');
+        marker.setAttribute('class', 'calibration-marker');
+
+        // Create label
+        const label = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', x + 10);
+        label.setAttribute('y', y - 10);
+        label.setAttribute('font-family', 'Arial');
+        label.setAttribute('font-size', '14');
+        label.setAttribute('font-weight', 'bold');
+        label.setAttribute('fill', '#ff0000');
+        label.setAttribute('class', 'calibration-label');
+        label.textContent = city.name;
+
+        svgElement.appendChild(marker);
+        svgElement.appendChild(label);
+
+        output += `${city.name.padEnd(20)}: (${x.toFixed(1)}, ${y.toFixed(1)})\n`;
+      });
+
+      document.getElementById('output').textContent = output;
+    };
+
+    window.resetDefaults = function() {
+      document.getElementById('north').value = '23.4';
+      document.getElementById('south').value = '19.6';
+      document.getElementById('west').value = '-85.2';
+      document.getElementById('east').value = '-73.8';
+      document.getElementById('offsetX').value = '0';
+      document.getElementById('offsetY').value = '40';
+      updateMap();
+    };
+
+    // Auto-load markers when SVG is ready
+    const mapObject = document.getElementById('cuba-map');
+    mapObject.addEventListener('load', () => {
+      setTimeout(updateMap, 100);
+    });
+
+    if (mapObject.contentDocument) {
+      setTimeout(updateMap, 100);
+    }
+  </script>
+</body>
+</html>

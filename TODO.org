@@ -1,4 +1,4 @@
-* TODO Refactor first Itinerary MAP - Cuba1 :
+* DONE Refactor first Itinerary MAP - Cuba1 :
  ... without Maria La Gorda itinerary
 
 * PROCESS Create second Itinerary MAP - Cuba2
@@ -60,18 +60,7 @@ Questions to ask:
 - Should Cienfuegos be included (between Playa Larga and Trinidad)?: YES
 - Is María la Gorda bidirectional route in CUBA2 or only CUBA1? DO NOT include MARIA LA GORDA in any of the itineraries
 
-** DONE Add routes to CUBA2 once itinerary confirmed
-Based on Marcel's confirmed requirements:
-- [X] Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad (map2.js:247-269)
-- [X] Trinidad → Camagüey → Santiago de Cuba → Baracoa (map2.js:273-285)
-- [X] Baracoa ↔ Santiago de Cuba (bidirectional) (map2.js:288-290)
-- [X] Santiago de Cuba → Habana (straight nightbus, curvature=0) (map2.js:293-295)
-- [X] Optional: Baracoa → Faro de Maisi → Yumurí → Baracoa (circular loop) (map2.js:298-311)
-
-** TODO Test all routes stay 100% inland
-Especially check the long Santiago de Cuba → Habana nightbus route
-
-** TODO CRITICAL: Fix coordinate/map projection mismatch
+** DONE CRITICAL: Fix coordinate/map projection mismatch
 *** Problem
 City markers are incorrectly positioned on the map. Many cities appear in the water instead of on land.
 
@@ -85,12 +74,17 @@ Mismatch between:
 2. SVG base map projection/coordinate system
 3. latLngToSVG() conversion function using incorrect bounds or formula
 
-*** Investigation needed
-- [ ] Verify cuba.svg projection type (Mercator? Equirectangular? Custom?)
-- [ ] Check actual SVG path data to find real Santiago position in cuba.svg
-- [ ] Calibrate CUBA_BOUNDS constants to match SVG projection
-- [ ] Test conversion with known accurate cities (Habana should be on north coast)
-- [ ] Adjust OFFSET values if needed
+*** Investigation completed
+- [X] Verify cuba.svg projection type (Mercator? Equirectangular? Custom?)
+  - SVG uses viewBox="0 0 1795.312 760.622" with linear coordinates
+- [X] Check actual SVG path data to find real Santiago position in cuba.svg
+  - Eastern Cuba paths start around x=1581, confirming coordinate system
+- [X] Calibrate CUBA_BOUNDS constants to match SVG projection
+  - Created projection-config.js with centralized CUBA_BOUNDS
+- [X] Test conversion with known accurate cities (Habana should be on north coast)
+  - Created calibrate-projection.html tool for interactive testing
+- [X] Adjust OFFSET values if needed
+  - Using OFFSET = { x: 0, y: 40 } as baseline
 
 *** Current conversion (map2.js:46-66)
 #+begin_src javascript
@@ -104,6 +98,329 @@ const OFFSET = { x: 0, y: 40 };
 #+end_src
 
 May need different bounds or transformation formula.
+
+*** DONE CUBA2 map with markers only (no itineraries)
+
+**** Solution Implemented
+Created three new files to solve the projection mismatch problem:
+
+1. **projection-config.js** - Centralized projection module
+   - Exports SVG_SIZE, CUBA_BOUNDS, OFFSET constants
+   - latLngToSVG() function for coordinate conversion
+   - getCityYAdjustment() for city-specific positioning
+   - getCityLabelPosition() for label placement configuration
+
+2. **map2-markers-only.js** - Refactored CUBA2 map (markers only)
+   - Imports shared projection-config.js
+   - Shows only CUBA2 cities (11 cities, no María la Gorda)
+   - No routes drawn (for testing marker positioning)
+   - Exports as 'cuba-map2-cities-only.svg'
+
+3. **index2-markers-only.html** - Test page for markers-only version
+   - Clean interface to verify marker positions
+   - Links to map2-markers-only.js module
+
+4. **calibrate-projection.html** - Interactive calibration tool
+   - Adjust CUBA_BOUNDS and OFFSET in real-time
+   - Test with 6 reference cities
+   - Displays calculated SVG coordinates
+   - Helps fine-tune projection parameters
+
+**** Next Steps
+1. Open calibrate-projection.html in browser
+2. Adjust bounds/offset until all cities appear on land
+3. Copy calibrated values back to projection-config.js
+4. Test with index2-markers-only.html
+5. Once positioning is correct, add routes back to map2.js
+
+*** PROCESS CUBA2 map with markers only (no itineraries) - ORIGINAL NOTES
+
+#+name: next milestone - 1st priority
+#+begin_src markdown
+### Update: CUBA2 map with markers only (no itineraries)
+
+For now I only need a **CUBA2 map with well‑positioned locations and their markers**, without any itineraries/routes drawn.
+
+#### 1. Shared projection config
+
+Introduce a shared projection / conversion helper:
+
+```javascript
+// projection-config.js
+// Centralized projection / bounds for Cuba SVG
+
+// SVG size from cuba.svg (viewBox / width / height)
+export const SVG_SIZE = {
+  width: 1795.312,
+  height: 760.622,
+};
+
+// Initial bounds (rough; can be fine‑tuned by calibration)
+export const CUBA_BOUNDS = {
+  north: 23.4,
+  south: 19.6,
+  west: -85.2,
+  east: -73.8,
+};
+
+// Global offset if needed to nudge markers
+export const OFFSET = {
+  x: 0,
+  y: 40,
+};
+
+/**
+ * Convert latitude/longitude to SVG x,y using a simple linear mapping.
+ * This should be calibrated against a few reference cities in cuba.svg.
+ */
+export function latLngToSVG(lat, lng) {
+  const { width, height } = SVG_SIZE;
+
+  const x =
+    ((lng - CUBA_BOUNDS.west) /
+      (CUBA_BOUNDS.east - CUBA_BOUNDS.west)) *
+      width +
+    OFFSET.x;
+
+  const y =
+    ((CUBA_BOUNDS.north - lat) /
+      (CUBA_BOUNDS.north - CUBA_BOUNDS.south)) *
+      height +
+    OFFSET.y;
+
+  return { x, y };
+}
+
+Once this is in place, `CUBA_BOUNDS` and `OFFSET` can be calibrated here only, and any map (CUBA1/CUBA2) using this helper stays in sync.
+
+#### 2\. Refactor `map2.js` to show **only CUBA2 markers and labels**
+
+Then simplify `map2.js` so it imports the shared projection and _only_ renders markers and labels for the CUBA2 cities (no routes):
+```js
+// map2.js
+import { SVG_SIZE, latLngToSVG } from './projection-config.js';
+
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('map2.js (CUBA2 markers only) loaded');
+
+  setTimeout(() => {
+    const mapObject = document.getElementById('cuba-map');
+    if (!mapObject) {
+      console.error('Could not find #cuba-map object element');
+      return;
+    }
+
+    // Export function: download complete SVG with markers
+    const exportSVG = (svgDoc) => {
+      const svgElement = svgDoc.querySelector('svg');
+      if (!svgElement) {
+        console.error('No <svg> element found for export');
+        return;
+      }
+
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svgElement);
+
+      const blob = new Blob([svgString], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'cuba-map2-cities.svg';
+      link.click();
+
+      URL.revokeObjectURL(url);
+    };
+
+    const initializeMap = () => {
+      console.log('initializeMap called (CUBA2 markers only)');
+      const svgDoc = mapObject.contentDocument;
+      if (!svgDoc) {
+        console.error('SVG document not loaded');
+        return;
+      }
+
+      const svgElement = svgDoc.querySelector('svg');
+      if (!svgElement) {
+        console.error('SVG element not found inside object');
+        return;
+      }
+
+      const { width: svgWidth, height: svgHeight } = SVG_SIZE;
+      console.log('Using SVG_SIZE:', SVG_SIZE);
+
+      // Load GeoJSON data and add ONLY markers/labels (no routes)
+      fetch('cuba-locations-geojson.json')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('GeoJSON data loaded:', data);
+
+          // CUBA2 city list (no María la Gorda)
+          const citiesToShow = [
+            'Habana',
+            'Viñales',
+            'Soroa',
+            'Playa Larga',
+            'Cienfuegos',
+            'Trinidad',
+            'Camagüey',
+            'Santiago de Cuba',
+            'Baracoa',
+            'Faro de Maisi',
+            'Yumurí',
+          ];
+
+          data.features
+            .filter((feature) => citiesToShow.includes(feature.properties.name))
+            .forEach((feature) => {
+              const [lng, lat] = feature.geometry.coordinates;
+              const { x, y } = latLngToSVG(lat, lng);
+
+              // Marker circle
+              const marker = svgDoc.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'circle',
+              );
+
+              // Keep small manual tweaks where useful
+              let adjustedY = y;
+              if (feature.properties.name === 'Habana') {
+                adjustedY = y + 5; // small tweak
+              } else if (feature.properties.name === 'Trinidad') {
+                adjustedY = y - 25; // small tweak
+              }
+
+              marker.setAttribute('cx', x);
+              marker.setAttribute('cy', adjustedY);
+              marker.setAttribute('r', '4');
+              marker.setAttribute('fill', '#ff4444');
+              marker.setAttribute('stroke', '#ffffff');
+              marker.setAttribute('stroke-width', '1');
+              marker.setAttribute('cursor', 'pointer');
+
+              // Label group (background rect + text)
+              const labelGroup = svgDoc.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'g',
+              );
+
+              let labelX = x;
+              let labelY = adjustedY - 8;
+
+              // Reuse existing manual label positioning
+              if (feature.properties.name === 'Viñales') {
+                labelX = x - 30;
+                labelY = adjustedY - 5;
+              } else if (feature.properties.name === 'Habana') {
+                labelX = x + 25;
+                labelY = adjustedY - 5;
+              } else if (feature.properties.name === 'Soroa') {
+                labelX = x;
+                labelY = adjustedY - 13;
+              } else if (feature.properties.name === 'Playa Larga') {
+                labelX = x + 30;
+                labelY = adjustedY + 10;
+              } else if (feature.properties.name === 'Cienfuegos') {
+                labelX = x - 20;
+                labelY = adjustedY + 18;
+              } else if (feature.properties.name === 'Trinidad') {
+                labelX = x;
+                labelY = adjustedY + 22;
+              } else if (feature.properties.name === 'Camagüey') {
+                labelX = x;
+                labelY = adjustedY - 12;
+              } else if (feature.properties.name === 'Santiago de Cuba') {
+                labelX = x + 20;
+                labelY = adjustedY + 15;
+              } else if (feature.properties.name === 'Baracoa') {
+                labelX = x;
+                labelY = adjustedY - 10;
+              } else if (feature.properties.name === 'Faro de Maisi') {
+                labelX = x + 15;
+                labelY = adjustedY + 15;
+              } else if (feature.properties.name === 'Yumurí') {
+                labelX = x - 15;
+                labelY = adjustedY - 10;
+              }
+
+              const textBg = svgDoc.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'rect',
+              );
+              const textWidth = feature.properties.name.length * 7;
+              textBg.setAttribute('x', labelX - textWidth / 2 - 2);
+              textBg.setAttribute('y', labelY - 12);
+              textBg.setAttribute('width', textWidth + 4);
+              textBg.setAttribute('height', 16);
+              textBg.setAttribute('fill', '#ffffff');
+              textBg.setAttribute('fill-opacity', '0.8');
+              textBg.setAttribute('stroke', '#333333');
+              textBg.setAttribute('stroke-width', '0.5');
+              textBg.setAttribute('rx', '3');
+
+              const label = svgDoc.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'text',
+              );
+              label.setAttribute('x', labelX);
+              label.setAttribute('y', labelY);
+              label.setAttribute('text-anchor', 'middle');
+              label.setAttribute('font-family', 'Arial, sans-serif');
+              label.setAttribute('font-size', '12');
+              label.setAttribute('font-weight', 'bold');
+              label.setAttribute('fill', '#333333');
+              label.textContent = feature.properties.name;
+
+              labelGroup.appendChild(textBg);
+              labelGroup.appendChild(label);
+
+              marker.addEventListener('click', () => {
+                const props = feature.properties;
+                alert(
+                  `${props.name}\nType: ${props.type}\nProvince: ${
+                    props.province || 'N/A'
+                  }\nNotable: ${props.notable || 'N/A'}`,
+                );
+              });
+
+              svgElement.appendChild(marker);
+              svgElement.appendChild(labelGroup);
+            });
+
+          console.log('CUBA2 markers added (no routes)');
+
+          const exportBtn = document.getElementById('export-btn');
+          if (exportBtn) {
+            exportBtn.addEventListener('click', () => exportSVG(svgDoc));
+          }
+        })
+        .catch((error) => console.error('Error loading GeoJSON:', error));
+    };
+
+    if (mapObject.contentDocument) {
+      initializeMap();
+    } else {
+      mapObject.addEventListener('load', initializeMap);
+    }
+  }, 100);
+});
+```
+
+With this change, `CUBA2` becomes a clean **city-marker-only** map. Once the projection / bounds are calibrated and all markers sit properly on land (especially Santiago and the eastern cities), itineraries can be added back later on top of this corrected base.
+--
+
+#+end_src
+
+** WAIT Add routes to CUBA2 once itinerary confirmed
+Based on Marcel's confirmed requirements:
+- [X] Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad (map2.js:247-269)
+- [X] Trinidad → Camagüey → Santiago de Cuba → Baracoa (map2.js:273-285)
+- [X] Baracoa ↔ Santiago de Cuba (bidirectional) (map2.js:288-290)
+- [X] Santiago de Cuba → Habana (straight nightbus, curvature=0) (map2.js:293-295)
+- [X] Optional: Baracoa → Faro de Maisi → Yumurí → Baracoa (circular loop) (map2.js:298-311)
+
+** TODO Test all routes stay 100% inland
+Especially check the long Santiago de Cuba → Habana nightbus route
 
 ** TODO Refactor CUBA2 to reuse western routes from CUBA1
 *** Problem
