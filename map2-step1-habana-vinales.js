@@ -216,9 +216,9 @@ window.addEventListener('DOMContentLoaded', () => {
           const vinales = data.features.find(f => f.properties.name === 'Viñales');
 
           if (habana && vinales) {
-            // Route 1: Habana → Viñales (upper curve, curvature = -60)
-            drawSingleRoute(svgDoc, svgElement, habana, vinales, -60);
-            console.log('✅ Step 1: Habana → Viñales route drawn');
+            // Route 1: Habana → Viñales (subtle south curve, same as CUBA1)
+            drawSingleRoute(svgDoc, svgElement, habana, vinales, 15);
+            console.log('✅ Step 1: Habana → Viñales route drawn (curvature=15)');
           }
 
           // Wire export button
