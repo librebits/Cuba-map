@@ -24,21 +24,22 @@ export const BASE_OFFSET = {
   y: 40,  // Works well for western cities
 };
 
-// Per-city correction offsets (manually calibrated)
+// Per-city correction offsets (manually calibrated with calibrate-per-city.html)
 // cuba.svg projection is non-linear: western vs eastern Cuba differ by ~80px on Y axis
 // These deltas correct the baseline position for each city
+// Calibration date: 2025-11-25 (v1)
 export const CITY_OFFSETS = {
-  'Habana': { deltaX: 0, deltaY: 0 },
+  'Habana': { deltaX: 0, deltaY: 6 },
   'Viñales': { deltaX: 0, deltaY: 0 },
   'Soroa': { deltaX: 0, deltaY: 0 },
-  'Playa Larga': { deltaX: 0, deltaY: 0 },
-  'Cienfuegos': { deltaX: 0, deltaY: 0 },
-  'Trinidad': { deltaX: 0, deltaY: 0 },
-  'Camagüey': { deltaX: 0, deltaY: 0 },
-  'Santiago de Cuba': { deltaX: 0, deltaY: 0 },
-  'Baracoa': { deltaX: 0, deltaY: 0 },
-  'Faro de Maisi': { deltaX: 0, deltaY: 0 },
-  'Yumurí': { deltaX: 0, deltaY: 0 },
+  'Playa Larga': { deltaX: 9, deltaY: 0 },
+  'Cienfuegos': { deltaX: 4, deltaY: 0 },
+  'Trinidad': { deltaX: 0, deltaY: -28 },
+  'Camagüey': { deltaX: 0, deltaY: -17 },
+  'Santiago de Cuba': { deltaX: 0, deltaY: -91 },
+  'Baracoa': { deltaX: 0, deltaY: -84 },
+  'Faro de Maisi': { deltaX: 0, deltaY: -93 },
+  'Yumurí': { deltaX: 0, deltaY: -85 },
 };
 
 /**
