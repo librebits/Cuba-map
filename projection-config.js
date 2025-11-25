@@ -35,7 +35,7 @@ export const CITY_OFFSETS = {
   'Soroa': { deltaX: 0, deltaY: 0 },
   'Playa Larga': { deltaX: 9, deltaY: 0 },
   'Cienfuegos': { deltaX: 4, deltaY: 0 },
-  'Trinidad': { deltaX: 0, deltaY: -53 },  // Includes legacy adjustment
+  'Trinidad': { deltaX: 0, deltaY: -43 },  // Adjusted 10px south
   'Camagüey': { deltaX: 0, deltaY: -17 },
   'Santiago de Cuba': { deltaX: 0, deltaY: -91 },
   'Baracoa': { deltaX: 0, deltaY: -84 },
