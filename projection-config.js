@@ -8,9 +8,9 @@ export const SVG_SIZE = {
   height: 760.622,
 };
 
-// Geographic bounds for Cuba
+// Geographic bounds for Cuba (baseline approximation)
 // These bounds define the lat/lng rectangle that maps to the SVG viewBox
-// Calibrated to match the cuba.svg map projection
+// Note: cuba.svg uses non-linear projection, so per-city corrections needed
 export const CUBA_BOUNDS = {
   north: 23.4,   // Northern coast
   south: 19.6,   // Southern coast
@@ -18,35 +18,70 @@ export const CUBA_BOUNDS = {
   east: -73.8,   // Eastern tip (Faro de Maisí)
 };
 
-// Global offset to fine-tune marker positioning
-// Adjust these values if markers need systematic shifting
-export const OFFSET = {
+// Base offset applied to all cities (baseline)
+export const BASE_OFFSET = {
   x: 0,
-  y: 40,  // Moves markers up to better align with coastlines
+  y: 40,  // Works well for western cities
+};
+
+// Per-city correction offsets (manually calibrated)
+// cuba.svg projection is non-linear: western vs eastern Cuba differ by ~80px on Y axis
+// These deltas correct the baseline position for each city
+export const CITY_OFFSETS = {
+  'Habana': { deltaX: 0, deltaY: 0 },
+  'Viñales': { deltaX: 0, deltaY: 0 },
+  'Soroa': { deltaX: 0, deltaY: 0 },
+  'Playa Larga': { deltaX: 0, deltaY: 0 },
+  'Cienfuegos': { deltaX: 0, deltaY: 0 },
+  'Trinidad': { deltaX: 0, deltaY: 0 },
+  'Camagüey': { deltaX: 0, deltaY: 0 },
+  'Santiago de Cuba': { deltaX: 0, deltaY: 0 },
+  'Baracoa': { deltaX: 0, deltaY: 0 },
+  'Faro de Maisi': { deltaX: 0, deltaY: 0 },
+  'Yumurí': { deltaX: 0, deltaY: 0 },
 };
 
 /**
  * Convert latitude/longitude to SVG x,y coordinates
- * Uses simple linear (equirectangular) projection
+ * Uses baseline linear projection + per-city corrections
  *
  * @param {number} lat - Latitude in degrees
  * @param {number} lng - Longitude in degrees
+ * @param {string} [cityName] - Optional city name for per-city correction
  * @returns {{x: number, y: number}} SVG pixel coordinates
  */
-export function latLngToSVG(lat, lng) {
+export function latLngToSVG(lat, lng, cityName = null) {
   const { width, height } = SVG_SIZE;
 
-  // Linear mapping from lng to x (west to east)
-  const x =
-    ((lng - CUBA_BOUNDS.west) / (CUBA_BOUNDS.east - CUBA_BOUNDS.west)) * width +
-    OFFSET.x;
+  // Step 1: Baseline linear conversion
+  const baseX = ((lng - CUBA_BOUNDS.west) / (CUBA_BOUNDS.east - CUBA_BOUNDS.west)) * width;
+  const baseY = ((CUBA_BOUNDS.north - lat) / (CUBA_BOUNDS.north - CUBA_BOUNDS.south)) * height;
 
-  // Linear mapping from lat to y (north to south, inverted for SVG)
-  const y =
-    ((CUBA_BOUNDS.north - lat) / (CUBA_BOUNDS.north - CUBA_BOUNDS.south)) * height +
-    OFFSET.y;
+  // Step 2: Apply base offset
+  let x = baseX + BASE_OFFSET.x;
+  let y = baseY + BASE_OFFSET.y;
+
+  // Step 3: Apply city-specific correction (if available)
+  if (cityName && CITY_OFFSETS[cityName]) {
+    x += CITY_OFFSETS[cityName].deltaX;
+    y += CITY_OFFSETS[cityName].deltaY;
+  }
 
   return { x, y };
+}
+
+/**
+ * Get baseline position (without city-specific corrections)
+ * Useful for calibration tools to show before/after
+ */
+export function getBaselinePosition(lat, lng) {
+  const { width, height } = SVG_SIZE;
+  const baseX = ((lng - CUBA_BOUNDS.west) / (CUBA_BOUNDS.east - CUBA_BOUNDS.west)) * width;
+  const baseY = ((CUBA_BOUNDS.north - lat) / (CUBA_BOUNDS.north - CUBA_BOUNDS.south)) * height;
+  return {
+    x: baseX + BASE_OFFSET.x,
+    y: baseY + BASE_OFFSET.y
+  };
 }
 
 /**

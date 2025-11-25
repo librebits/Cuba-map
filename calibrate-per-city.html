@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuba Map - Per-City Calibration Tool</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+    }
+    .container {
+      max-width: 1900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #0978AB 0%, #075a7a 100%);
+      color: white;
+      padding: 25px 30px;
+    }
+    .header h1 {
+      margin: 0 0 10px 0;
+      font-size: 28px;
+    }
+    .header p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 14px;
+    }
+    .controls {
+      padding: 25px 30px;
+      background: #f8f9fa;
+      border-bottom: 2px solid #e9ecef;
+    }
+    .city-selector {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .city-selector select {
+      flex: 1;
+      min-width: 200px;
+      padding: 12px 15px;
+      font-size: 16px;
+      border: 2px solid #0978AB;
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .progress {
+      padding: 8px 15px;
+      background: #0978AB;
+      color: white;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .slider-group {
+      margin: 15px 0;
+    }
+    .slider-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #555;
+      font-size: 14px;
+    }
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .slider-container input[type="range"] {
+      flex: 1;
+      height: 8px;
+      border-radius: 4px;
+      background: #ddd;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .slider-container input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #0978AB;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .slider-container input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #0978AB;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .value-display {
+      min-width: 60px;
+      padding: 8px 12px;
+      background: white;
+      border: 2px solid #0978AB;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      color: #0978AB;
+      font-size: 16px;
+    }
+    .position-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 20px 0;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      border: 2px solid #e9ecef;
+    }
+    .position-box {
+      padding: 12px;
+      border-radius: 6px;
+    }
+    .position-box.baseline {
+      background: #f1f3f5;
+      border-left: 4px solid #868e96;
+    }
+    .position-box.adjusted {
+      background: #ffe8e8;
+      border-left: 4px solid #ff4444;
+    }
+    .position-box h4 {
+      margin: 0 0 8px 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .position-box p {
+      margin: 4px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    .btn-primary {
+      background: #0978AB;
+      color: white;
+    }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    .btn-warning {
+      background: #ffc107;
+      color: #333;
+    }
+    #cuba-map {
+      width: 100%;
+      height: 700px;
+      border: none;
+      background: #C6ECFF;
+    }
+    .keyboard-hint {
+      margin-top: 15px;
+      padding: 12px;
+      background: #e7f3ff;
+      border-left: 4px solid #0978AB;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #555;
+    }
+    .keyboard-hint kbd {
+      background: white;
+      padding: 3px 8px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-family: monospace;
+      font-weight: bold;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .export-section {
+      padding: 25px 30px;
+      background: #f8f9fa;
+      border-top: 2px solid #e9ecef;
+    }
+    #export-output {
+      width: 100%;
+      height: 200px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      border: 2px solid #0978AB;
+      border-radius: 6px;
+      background: #f8f9fa;
+      resize: vertical;
+    }
+    .status-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      background: #28a745;
+      color: white;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1000;
+    }
+    .status-message.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🗺️ Cuba Map - Per-City Calibration Tool</h1>
+      <p>Calibrate each city individually to handle non-linear projection (Western vs Eastern Cuba ~80px Y difference)</p>
+    </div>
+
+    <div class="controls">
+      <div class="city-selector">
+        <select id="city-select">
+          <option value="Habana">Habana</option>
+          <option value="Viñales">Viñales</option>
+          <option value="Soroa">Soroa</option>
+          <option value="Playa Larga">Playa Larga</option>
+          <option value="Cienfuegos">Cienfuegos</option>
+          <option value="Trinidad">Trinidad</option>
+          <option value="Camagüey">Camagüey</option>
+          <option value="Santiago de Cuba">Santiago de Cuba</option>
+          <option value="Baracoa">Baracoa</option>
+          <option value="Faro de Maisi">Faro de Maisi</option>
+          <option value="Yumurí">Yumurí</option>
+        </select>
+        <div class="progress" id="progress">City 1/11</div>
+      </div>
+
+      <div class="position-info">
+        <div class="position-box baseline">
+          <h4>⚪ Baseline Position (Gray)</h4>
+          <p>x: <span id="baseline-x">0</span></p>
+          <p>y: <span id="baseline-y">0</span></p>
+        </div>
+        <div class="position-box adjusted">
+          <h4>🔴 Adjusted Position (Red)</h4>
+          <p>x: <span id="adjusted-x">0</span></p>
+          <p>y: <span id="adjusted-y">0</span></p>
+        </div>
+      </div>
+
+      <div class="slider-group">
+        <label for="delta-x">Horizontal Correction (deltaX)</label>
+        <div class="slider-container">
+          <input type="range" id="delta-x" min="-150" max="150" value="0" step="1">
+          <div class="value-display" id="delta-x-value">0</div>
+        </div>
+      </div>
+
+      <div class="slider-group">
+        <label for="delta-y">Vertical Correction (deltaY)</label>
+        <div class="slider-container">
+          <input type="range" id="delta-y" min="-150" max="150" value="0" step="1">
+          <div class="value-display" id="delta-y-value">0</div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button class="btn-secondary" onclick="prevCity()">⬅️ Previous City</button>
+        <button class="btn-danger" onclick="resetCity()">🔄 Reset This City</button>
+        <button class="btn-success" onclick="nextCity()">Next City ➡️</button>
+      </div>
+
+      <div class="keyboard-hint">
+        ⌨️ <strong>Keyboard shortcuts:</strong>
+        <kbd>←</kbd> <kbd>→</kbd> Adjust deltaX (±1px) |
+        <kbd>↑</kbd> <kbd>↓</kbd> Adjust deltaY (±1px) |
+        <kbd>Shift</kbd> + arrows = ±10px |
+        <kbd>Enter</kbd> Next city |
+        <kbd>R</kbd> Reset city
+      </div>
+    </div>
+
+    <object id="cuba-map" data="cuba.svg" type="image/svg+xml"></object>
+
+    <div class="export-section">
+      <h3>📤 Export Configuration</h3>
+      <div class="buttons">
+        <button class="btn-primary" onclick="exportOffsets()">📋 Export CITY_OFFSETS</button>
+        <button class="btn-warning" onclick="saveProgress()">💾 Save Progress (localStorage)</button>
+        <button class="btn-secondary" onclick="loadProgress()">📂 Load Progress</button>
+        <button class="btn-danger" onclick="resetAll()">🗑️ Reset All Cities</button>
+      </div>
+      <textarea id="export-output" readonly placeholder="Click 'Export CITY_OFFSETS' to generate configuration code..."></textarea>
+    </div>
+  </div>
+
+  <div class="status-message" id="status-message"></div>
+
+  <script type="module">
+    import { getBaselinePosition, CITY_OFFSETS } from './projection-config.js';
+
+    const cities = [
+      { name: 'Habana', lat: 23.1136, lng: -82.3666 },
+      { name: 'Viñales', lat: 22.6167, lng: -83.7167 },
+      { name: 'Soroa', lat: 22.7833, lng: -82.9667 },
+      { name: 'Playa Larga', lat: 22.2667, lng: -81.2000 },
+      { name: 'Cienfuegos', lat: 22.1467, lng: -80.4400 },
+      { name: 'Trinidad', lat: 21.8022, lng: -79.9847 },
+      { name: 'Camagüey', lat: 21.38, lng: -77.92 },
+      { name: 'Santiago de Cuba', lat: 20.0247, lng: -75.8219 },
+      { name: 'Baracoa', lat: 20.3475, lng: -74.5024 },
+      { name: 'Faro de Maisi', lat: 20.2089, lng: -74.1336 },
+      { name: 'Yumurí', lat: 20.3009, lng: -74.2976 },
+    ];
+
+    let currentCityIndex = 0;
+    let offsets = {};
+
+    // Initialize from CITY_OFFSETS
+    cities.forEach(city => {
+      offsets[city.name] = { ...CITY_OFFSETS[city.name] };
+    });
+
+    let svgDoc = null;
+    let baselineMarker = null;
+    let adjustedMarker = null;
+    let baselineLabel = null;
+    let adjustedLabel = null;
+
+    const mapObject = document.getElementById('cuba-map');
+    const citySelect = document.getElementById('city-select');
+    const deltaXSlider = document.getElementById('delta-x');
+    const deltaYSlider = document.getElementById('delta-y');
+    const deltaXValue = document.getElementById('delta-x-value');
+    const deltaYValue = document.getElementById('delta-y-value');
+
+    function showStatus(message, duration = 2000) {
+      const statusEl = document.getElementById('status-message');
+      statusEl.textContent = message;
+      statusEl.classList.add('show');
+      setTimeout(() => statusEl.classList.remove('show'), duration);
+    }
+
+    function updateMarkers() {
+      if (!svgDoc) return;
+
+      const city = cities[currentCityIndex];
+      const baseline = getBaselinePosition(city.lat, city.lng);
+      const offset = offsets[city.name];
+      const adjusted = {
+        x: baseline.x + offset.deltaX,
+        y: baseline.y + offset.deltaY
+      };
+
+      // Update position displays
+      document.getElementById('baseline-x').textContent = baseline.x.toFixed(1);
+      document.getElementById('baseline-y').textContent = baseline.y.toFixed(1);
+      document.getElementById('adjusted-x').textContent = adjusted.x.toFixed(1);
+      document.getElementById('adjusted-y').textContent = adjusted.y.toFixed(1);
+
+      // Update sliders
+      deltaXSlider.value = offset.deltaX;
+      deltaYSlider.value = offset.deltaY;
+      deltaXValue.textContent = offset.deltaX;
+      deltaYValue.textContent = offset.deltaY;
+
+      // Update progress
+      document.getElementById('progress').textContent = `City ${currentCityIndex + 1}/11`;
+
+      const svgElement = svgDoc.querySelector('svg');
+
+      // Remove old markers
+      [baselineMarker, adjustedMarker, baselineLabel, adjustedLabel].forEach(el => {
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+      });
+
+      // Create baseline marker (gray)
+      baselineMarker = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      baselineMarker.setAttribute('cx', baseline.x);
+      baselineMarker.setAttribute('cy', baseline.y);
+      baselineMarker.setAttribute('r', '8');
+      baselineMarker.setAttribute('fill', '#868e96');
+      baselineMarker.setAttribute('stroke', '#ffffff');
+      baselineMarker.setAttribute('stroke-width', '2');
+      baselineMarker.setAttribute('opacity', '0.6');
+
+      // Create adjusted marker (red)
+      adjustedMarker = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      adjustedMarker.setAttribute('cx', adjusted.x);
+      adjustedMarker.setAttribute('cy', adjusted.y);
+      adjustedMarker.setAttribute('r', '8');
+      adjustedMarker.setAttribute('fill', '#ff4444');
+      adjustedMarker.setAttribute('stroke', '#ffffff');
+      adjustedMarker.setAttribute('stroke-width', '2');
+
+      // Create baseline label
+      baselineLabel = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
+      baselineLabel.setAttribute('x', baseline.x + 15);
+      baselineLabel.setAttribute('y', baseline.y - 10);
+      baselineLabel.setAttribute('font-family', 'Arial, sans-serif');
+      baselineLabel.setAttribute('font-size', '14');
+      baselineLabel.setAttribute('font-weight', 'bold');
+      baselineLabel.setAttribute('fill', '#868e96');
+      baselineLabel.textContent = `${city.name} (baseline)`;
+
+      // Create adjusted label
+      adjustedLabel = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
+      adjustedLabel.setAttribute('x', adjusted.x + 15);
+      adjustedLabel.setAttribute('y', adjusted.y + 25);
+      adjustedLabel.setAttribute('font-family', 'Arial, sans-serif');
+      adjustedLabel.setAttribute('font-size', '16');
+      adjustedLabel.setAttribute('font-weight', 'bold');
+      adjustedLabel.setAttribute('fill', '#ff4444');
+      adjustedLabel.textContent = city.name;
+
+      svgElement.appendChild(baselineMarker);
+      svgElement.appendChild(adjustedMarker);
+      svgElement.appendChild(baselineLabel);
+      svgElement.appendChild(adjustedLabel);
+    }
+
+    function loadCity() {
+      const city = cities[currentCityIndex];
+      citySelect.value = city.name;
+      updateMarkers();
+    }
+
+    window.prevCity = function() {
+      if (currentCityIndex > 0) {
+        currentCityIndex--;
+        loadCity();
+      }
+    };
+
+    window.nextCity = function() {
+      if (currentCityIndex < cities.length - 1) {
+        currentCityIndex++;
+        loadCity();
+        showStatus('✅ Moved to next city');
+      } else {
+        showStatus('🎉 All cities calibrated!', 3000);
+      }
+    };
+
+    window.resetCity = function() {
+      const city = cities[currentCityIndex];
+      offsets[city.name] = { deltaX: 0, deltaY: 0 };
+      updateMarkers();
+      showStatus('🔄 City reset to baseline');
+    };
+
+    window.resetAll = function() {
+      if (confirm('Reset ALL cities to baseline? This cannot be undone.')) {
+        cities.forEach(city => {
+          offsets[city.name] = { deltaX: 0, deltaY: 0 };
+        });
+        updateMarkers();
+        showStatus('🗑️ All cities reset');
+      }
+    };
+
+    window.exportOffsets = function() {
+      let code = 'export const CITY_OFFSETS = {\n';
+      cities.forEach(city => {
+        const offset = offsets[city.name];
+        code += `  '${city.name}': { deltaX: ${offset.deltaX}, deltaY: ${offset.deltaY} },\n`;
+      });
+      code += '};\n';
+      document.getElementById('export-output').value = code;
+      showStatus('📋 Configuration exported!');
+    };
+
+    window.saveProgress = function() {
+      localStorage.setItem('cuba-map-offsets', JSON.stringify(offsets));
+      showStatus('💾 Progress saved to localStorage');
+    };
+
+    window.loadProgress = function() {
+      const saved = localStorage.getItem('cuba-map-offsets');
+      if (saved) {
+        offsets = JSON.parse(saved);
+        updateMarkers();
+        showStatus('📂 Progress loaded from localStorage');
+      } else {
+        showStatus('⚠️ No saved progress found');
+      }
+    };
+
+    // Slider events
+    deltaXSlider.addEventListener('input', (e) => {
+      const city = cities[currentCityIndex];
+      offsets[city.name].deltaX = parseInt(e.target.value);
+      updateMarkers();
+    });
+
+    deltaYSlider.addEventListener('input', (e) => {
+      const city = cities[currentCityIndex];
+      offsets[city.name].deltaY = parseInt(e.target.value);
+      updateMarkers();
+    });
+
+    // City selector
+    citySelect.addEventListener('change', (e) => {
+      currentCityIndex = cities.findIndex(c => c.name === e.target.value);
+      loadCity();
+    });
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      const city = cities[currentCityIndex];
+      const step = e.shiftKey ? 10 : 1;
+
+      switch(e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          offsets[city.name].deltaX -= step;
+          updateMarkers();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          offsets[city.name].deltaX += step;
+          updateMarkers();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          offsets[city.name].deltaY -= step;
+          updateMarkers();
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          offsets[city.name].deltaY += step;
+          updateMarkers();
+          break;
+        case 'Enter':
+          e.preventDefault();
+          nextCity();
+          break;
+        case 'r':
+        case 'R':
+          e.preventDefault();
+          resetCity();
+          break;
+      }
+    });
+
+    // Initialize when SVG loads
+    mapObject.addEventListener('load', () => {
+      svgDoc = mapObject.contentDocument;
+      loadCity();
+      showStatus('🚀 Calibration tool ready!', 3000);
+    });
+
+    if (mapObject.contentDocument) {
+      svgDoc = mapObject.contentDocument;
+      loadCity();
+    }
+  </script>
+</body>
+</html>

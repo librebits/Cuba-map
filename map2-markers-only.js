@@ -75,10 +75,13 @@ window.addEventListener('DOMContentLoaded', () => {
             .filter((feature) => citiesToShow.includes(feature.properties.name))
             .forEach((feature) => {
               const [lng, lat] = feature.geometry.coordinates;
-              const { x, y } = latLngToSVG(lat, lng);
+              const cityName = feature.properties.name;
 
-              // Apply city-specific Y adjustments
-              const adjustedY = getCityYAdjustment(feature.properties.name, y);
+              // Use latLngToSVG with cityName to apply per-city corrections
+              const { x, y } = latLngToSVG(lat, lng, cityName);
+
+              // Apply legacy city-specific Y adjustments (for backward compatibility)
+              const adjustedY = getCityYAdjustment(cityName, y);
 
               // Create marker circle
               const marker = svgDoc.createElementNS(
