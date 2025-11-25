@@ -126,12 +126,53 @@ Created three new files to solve the projection mismatch problem:
    - Displays calculated SVG coordinates
    - Helps fine-tune projection parameters
 
+**** DONE Manual Calibration Completed (2025-11-25)
+
+**Per-City Calibration System Implemented:**
+
+5. **calibrate-per-city.html** - Advanced per-city calibration tool
+   - City-by-city navigation (11 cities)
+   - Real-time sliders + keyboard controls (arrow keys, Enter, R)
+   - Visual feedback: gray baseline + red adjusted markers
+   - Save/Load progress to localStorage
+   - Export CITY_OFFSETS configuration code
+
+**Calibration Results (v1):**
+
+Manually calibrated all 11 cities using calibrate-per-city.html tool.
+Applied offsets to projection-config.js:
+
+- Western cities (Habana, Viñales, Soroa): deltaY ≈ 0 to +6
+- Central cities: deltaY ≈ 0 to -28, some deltaX adjustments
+  - Playa Larga: deltaX=+9, deltaY=0
+  - Cienfuegos: deltaX=+4, deltaY=0
+  - Trinidad: deltaY=-28
+  - Camagüey: deltaY=-17
+- Eastern cities: deltaY ≈ -84 to -93 (major correction!)
+  - Santiago de Cuba: deltaY=-91 ⭐
+  - Baracoa: deltaY=-84
+  - Faro de Maisi: deltaY=-93
+  - Yumurí: deltaY=-85
+
+**Key Findings:**
+- SVG projection is MORE non-linear than initially estimated
+- Eastern Cuba requires ~90px correction (not +80 as predicted)
+- Negative deltaY = move markers UP (north)
+- Baseline calculated positions too far south for eastern Cuba
+
+**Files:**
+- projection-config.js: Updated with calibrated CITY_OFFSETS
+- calibrate-per-city-v1.js: Exported calibration results (backup)
+
+**Status:** ✅ All cities now positioned correctly on land
+**Verified:** index2-markers-only.html shows correct positioning
+
 **** Next Steps
-1. Open calibrate-projection.html in browser
-2. Adjust bounds/offset until all cities appear on land
-3. Copy calibrated values back to projection-config.js
-4. Test with index2-markers-only.html
-5. Once positioning is correct, add routes back to map2.js
+1. ✅ DONE: Per-city calibration tool created
+2. ✅ DONE: All 11 cities manually calibrated
+3. ✅ DONE: CITY_OFFSETS applied to projection-config.js
+4. ✅ DONE: Test with index2-markers-only.html - ALL CITIES ON LAND
+5. TODO: Add routes back to map2.js (with calibrated positions)
 
 *** PROCESS CUBA2 map with markers only (no itineraries) - ORIGINAL NOTES
 
