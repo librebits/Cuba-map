@@ -244,10 +244,10 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log('✅ Step 4: Playa Larga → Cienfuegos route drawn (curvature=-20)');
           }
 
-          // STEP 5: Draw Cienfuegos → Trinidad route (subtle north curve inland)
+          // STEP 5: Draw Cienfuegos → Trinidad route (very subtle south curve)
           if (cienfuegos && trinidad) {
-            drawSingleRoute(svgDoc, svgElement, cienfuegos, trinidad, -12);
-            console.log('✅ Step 5: Cienfuegos → Trinidad route drawn (curvature=-12, north inland)');
+            drawSingleRoute(svgDoc, svgElement, cienfuegos, trinidad, 5);
+            console.log('✅ Step 5: Cienfuegos → Trinidad route drawn (curvature=+5, very subtle south)');
           }
 
           console.log('🎉 WESTERN ROUTES COMPLETE (all 5 routes from CUBA1)');
