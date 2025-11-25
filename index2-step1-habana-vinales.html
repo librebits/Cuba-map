@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuba Map - CUBA2 Step 1: Habana → Viñales</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1900px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    h1 {
+      color: #333;
+    }
+    .info {
+      background: #e8f4f8;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #0978AB;
+    }
+    .step-badge {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 14px;
+      margin-left: 10px;
+    }
+    #cuba-map {
+      width: 100%;
+      height: auto;
+      border: 2px solid #0978AB;
+      background: #C6ECFF;
+    }
+    button {
+      background: #0978AB;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 5px;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #075a7a;
+    }
+    .controls {
+      margin: 20px 0;
+    }
+    .checklist {
+      background: #fff3cd;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #ffc107;
+    }
+    .checklist ul {
+      margin: 10px 0;
+      padding-left: 25px;
+    }
+    .checklist li {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cuba Map - CUBA2 <span class="step-badge">STEP 1</span></h1>
+
+    <div class="info">
+      <strong>🎯 Goal:</strong> Test first route with calibrated city positions
+      <br>
+      <strong>📍 Route:</strong> Habana → Viñales
+      <br>
+      <strong>🎨 Style:</strong> Upper curve (curvature = -60), solid line with arrow
+      <br>
+      <strong>✅ Status:</strong> Using calibrated CITY_OFFSETS from projection-config.js
+    </div>
+
+    <div class="checklist">
+      <strong>📋 Verification Checklist:</strong>
+      <ul>
+        <li>✓ All 11 cities visible with markers (red circles)</li>
+        <li>✓ All cities positioned on land (using calibrated offsets)</li>
+        <li>✓ Habana marker on north coast</li>
+        <li>✓ Viñales marker in northwest interior</li>
+        <li>✓ Route line connects both cities</li>
+        <li>✓ Route has upper curve (goes inland/north)</li>
+        <li>✓ Route stays on land (not over water)</li>
+        <li>✓ Arrow appears at midpoint, pointing toward Viñales</li>
+      </ul>
+    </div>
+
+    <div class="controls">
+      <button id="export-btn">📥 Export Map as SVG</button>
+    </div>
+
+    <object id="cuba-map" data="cuba.svg" type="image/svg+xml"></object>
+  </div>
+
+  <script type="module" src="./map2-step1-habana-vinales.js"></script>
+</body>
+</html>
