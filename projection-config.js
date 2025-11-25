@@ -28,13 +28,14 @@ export const BASE_OFFSET = {
 // cuba.svg projection is non-linear: western vs eastern Cuba differ by ~80px on Y axis
 // These deltas correct the baseline position for each city
 // Calibration date: 2025-11-25 (v1)
+// Updated: Trinidad now includes legacy adjustment (-28 + -25 = -53)
 export const CITY_OFFSETS = {
   'Habana': { deltaX: 0, deltaY: 6 },
   'Viñales': { deltaX: 0, deltaY: 0 },
   'Soroa': { deltaX: 0, deltaY: 0 },
   'Playa Larga': { deltaX: 9, deltaY: 0 },
   'Cienfuegos': { deltaX: 4, deltaY: 0 },
-  'Trinidad': { deltaX: 0, deltaY: -28 },
+  'Trinidad': { deltaX: 0, deltaY: -53 },  // Includes legacy adjustment
   'Camagüey': { deltaX: 0, deltaY: -17 },
   'Santiago de Cuba': { deltaX: 0, deltaY: -91 },
   'Baracoa': { deltaX: 0, deltaY: -84 },
@@ -86,9 +87,11 @@ export function getBaselinePosition(lat, lng) {
 }
 
 /**
- * City-specific position adjustments
+ * City-specific position adjustments (LEGACY - mostly deprecated)
  * Use these for fine-tuning individual city marker positions
  * Returns adjusted y-coordinate or original if no adjustment needed
+ *
+ * NOTE: Trinidad now uses CITY_OFFSETS directly, no legacy adjustment needed
  *
  * @param {string} cityName - Name of the city
  * @param {number} y - Original y-coordinate
@@ -96,8 +99,8 @@ export function getBaselinePosition(lat, lng) {
  */
 export function getCityYAdjustment(cityName, y) {
   const adjustments = {
-    'Habana': y + 5,      // Move slightly south
-    'Trinidad': y - 25,   // Move north (avoid overlaps)
+    'Habana': y + 5,      // Move slightly south (legacy)
+    // 'Trinidad': removed - now uses CITY_OFFSETS deltaY = -53 directly
   };
 
   return adjustments[cityName] ?? y;
