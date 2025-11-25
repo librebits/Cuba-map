@@ -60,6 +60,7 @@ Baracoa → Faro de Maisí → Yumurí → Baracoa (anti-clockwise circular)
 - Browser-sync: http://localhost:3000/index2.html
 * Project Structure
 
+#+begin_src markdown
 ```
 cuba-map/
 ├── cuba.svg                      # Base SVG map (corrected viewBox for full island)
@@ -73,6 +74,7 @@ cuba-map/
 ├── CLAUDE.md                     # Project instructions for Claude Code
 └── Screenshots/                  # Visual documentation
 ```
+#+end_example
 
 * Development Setup
 
