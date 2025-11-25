@@ -36,6 +36,74 @@ window.addEventListener('DOMContentLoaded', () => {
       URL.revokeObjectURL(url);
     };
 
+    // Function to draw S-curve route (double curvature, goes inland)
+    function drawSCurveRoute(svgDoc, svgElement, startCity, endCity, northPull1, northPull2) {
+      const [startLng, startLat] = startCity.geometry.coordinates;
+      const [endLng, endLat] = endCity.geometry.coordinates;
+
+      // Use calibrated positions
+      const startPos = latLngToSVG(startLat, startLng, startCity.properties.name);
+      const endPos = latLngToSVG(endLat, endLng, endCity.properties.name);
+
+      const adjustedStartY = getCityYAdjustment(startCity.properties.name, startPos.y);
+      const adjustedEndY = getCityYAdjustment(endCity.properties.name, endPos.y);
+
+      // S-curve with asymmetric control points (25% and 75% instead of 33% and 67%)
+      const control1X = startPos.x + (endPos.x - startPos.x) * 0.25;
+      const control2X = startPos.x + (endPos.x - startPos.x) * 0.75;
+
+      // Pull control points north (inland) to create S-curve
+      const control1Y = adjustedStartY - northPull1;  // Strong pull at start
+      const control2Y = adjustedEndY - northPull2;    // Continue north toward end
+
+      // Create smooth S-shaped path
+      const pathData = `M ${startPos.x} ${adjustedStartY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endPos.x} ${adjustedEndY}`;
+
+      // Create path element
+      const path = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', pathData);
+      path.setAttribute('stroke', '#555555');
+      path.setAttribute('stroke-width', '2');
+      path.setAttribute('fill', 'none');
+
+      // Calculate midpoint for arrow (using cubic Bézier at t=0.5)
+      const t = 0.5;
+      const midX = Math.pow(1-t,3)*startPos.x + 3*Math.pow(1-t,2)*t*control1X + 3*(1-t)*Math.pow(t,2)*control2X + Math.pow(t,3)*endPos.x;
+      const midY = Math.pow(1-t,3)*adjustedStartY + 3*Math.pow(1-t,2)*t*control1Y + 3*(1-t)*Math.pow(t,2)*control2Y + Math.pow(t,3)*adjustedEndY;
+
+      // Calculate tangent for arrow orientation
+      const dt = 0.01;
+      const t1 = t - dt;
+      const t2 = t + dt;
+      const x1 = Math.pow(1-t1,3)*startPos.x + 3*Math.pow(1-t1,2)*t1*control1X + 3*(1-t1)*Math.pow(t1,2)*control2X + Math.pow(t1,3)*endPos.x;
+      const y1 = Math.pow(1-t1,3)*adjustedStartY + 3*Math.pow(1-t1,2)*t1*control1Y + 3*(1-t1)*Math.pow(t1,2)*control2Y + Math.pow(t1,3)*adjustedEndY;
+      const x2 = Math.pow(1-t2,3)*startPos.x + 3*Math.pow(1-t2,2)*t2*control1X + 3*(1-t2)*Math.pow(t2,2)*control2X + Math.pow(t2,3)*endPos.x;
+      const y2 = Math.pow(1-t2,3)*adjustedStartY + 3*Math.pow(1-t2,2)*t2*control1Y + 3*(1-t2)*Math.pow(t2,2)*control2Y + Math.pow(t2,3)*adjustedEndY;
+
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+
+      // Create arrow
+      const arrowSize = 9;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+
+      const arrowhead = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      const p1x = midX + arrowSize * cos;
+      const p1y = midY + arrowSize * sin;
+      const p2x = midX - arrowSize/2 * cos + arrowSize/2 * sin;
+      const p2y = midY - arrowSize/2 * sin - arrowSize/2 * cos;
+      const p3x = midX - arrowSize/2 * cos - arrowSize/2 * sin;
+      const p3y = midY - arrowSize/2 * sin + arrowSize/2 * cos;
+
+      arrowhead.setAttribute('points', `${p1x},${p1y} ${p2x},${p2y} ${p3x},${p3y}`);
+      arrowhead.setAttribute('fill', '#555555');
+
+      svgElement.appendChild(path);
+      svgElement.appendChild(arrowhead);
+
+      console.log(`S-curve route drawn: ${startCity.properties.name} → ${endCity.properties.name} (northPull: ${northPull1}, ${northPull2})`);
+    }
+
     // Function to draw a single curved route (from CUBA1, adapted for calibrated positions)
     function drawSingleRoute(svgDoc, svgElement, startCity, endCity, curvature) {
       const [startLng, startLat] = startCity.geometry.coordinates;
@@ -244,10 +312,10 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log('✅ Step 4: Playa Larga → Cienfuegos route drawn (curvature=-20)');
           }
 
-          // STEP 5: Draw Cienfuegos → Trinidad route (very subtle south curve)
+          // STEP 5: Draw Cienfuegos → Trinidad route (S-curve inland)
           if (cienfuegos && trinidad) {
-            drawSingleRoute(svgDoc, svgElement, cienfuegos, trinidad, 5);
-            console.log('✅ Step 5: Cienfuegos → Trinidad route drawn (curvature=+5, very subtle south)');
+            drawSCurveRoute(svgDoc, svgElement, cienfuegos, trinidad, 30, 20);
+            console.log('✅ Step 5: Cienfuegos → Trinidad route drawn (S-curve inland, northPull: 30, 20)');
           }
 
           console.log('🎉 WESTERN ROUTES COMPLETE (all 5 routes from CUBA1)');
