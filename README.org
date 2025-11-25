@@ -74,7 +74,7 @@ cuba-map/
 ├── CLAUDE.md                     # Project instructions for Claude Code
 └── Screenshots/                  # Visual documentation
 ```
-#+end_example
+#+end_src
 
 * Development Setup
 
