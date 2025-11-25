@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuba Map - CUBA2 Step 4: + Playa Larga → Cienfuegos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1900px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    h1 {
+      color: #333;
+    }
+    .info {
+      background: #e8f4f8;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #0978AB;
+    }
+    .step-badge {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 14px;
+      margin-left: 10px;
+    }
+    #cuba-map {
+      width: 100%;
+      height: auto;
+      border: 2px solid #0978AB;
+      background: #C6ECFF;
+    }
+    button {
+      background: #0978AB;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 5px;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #075a7a;
+    }
+    .controls {
+      margin: 20px 0;
+    }
+    .checklist {
+      background: #fff3cd;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #ffc107;
+    }
+    .checklist ul {
+      margin: 10px 0;
+      padding-left: 25px;
+    }
+    .checklist li {
+      margin: 5px 0;
+    }
+    .route-list {
+      background: #d4edda;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #28a745;
+    }
+    .route-list h3 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cuba Map - CUBA2 <span class="step-badge">STEP 4</span></h1>
+
+    <div class="info">
+      <strong>🎯 Goal:</strong> Add fourth route (inland curve away from sea)
+      <br>
+      <strong>📍 New Route:</strong> Playa Larga → Cienfuegos
+      <br>
+      <strong>🎨 Style:</strong> North curve (curvature = -20, inland/away from south coast), solid line with arrow
+      <br>
+      <strong>✅ Status:</strong> Using calibrated CITY_OFFSETS from projection-config.js
+    </div>
+
+    <div class="route-list">
+      <h3>🗺️ Routes Drawn (4 total):</h3>
+      <ol>
+        <li><strong>Habana → Viñales</strong> (curvature = +15, south curve)</li>
+        <li><strong>Viñales → Soroa</strong> (curvature = -10, north curve)</li>
+        <li><strong>Soroa → Playa Larga</strong> (curvature = -30, inland north)</li>
+        <li><strong>Playa Larga → Cienfuegos</strong> (curvature = -20, inland north) ← NEW</li>
+      </ol>
+    </div>
+
+    <div class="checklist">
+      <strong>📋 Verification Checklist:</strong>
+      <ul>
+        <li>✓ All 11 cities visible with markers</li>
+        <li>✓ Route 1 (Habana → Viñales) visible</li>
+        <li>✓ Route 2 (Viñales → Soroa) visible</li>
+        <li>✓ Route 3 (Soroa → Playa Larga) visible</li>
+        <li>✓ Route 4 (Playa Larga → Cienfuegos) visible with north curve</li>
+        <li>✓ All routes stay on land (not over water)</li>
+        <li>✓ All routes have arrows at midpoint</li>
+        <li>✓ Playa Larga has TWO routes connected (Soroa incoming, Cienfuegos outgoing)</li>
+        <li>✓ Route 4 curves inland (north) away from south coast</li>
+      </ul>
+    </div>
+
+    <div class="controls">
+      <button id="export-btn">📥 Export Map as SVG</button>
+    </div>
+
+    <object id="cuba-map" data="cuba.svg" type="image/svg+xml"></object>
+  </div>
+
+  <script type="module" src="./map2-step4-playalarga-cienfuegos.js"></script>
+</body>
+</html>
