@@ -54,22 +54,82 @@ Status: Completed. Trinidad → Habana loop removed. Route now ends at Trinidad.
 - [X] Reuse cuba.svg base map
 - [X] Export button wired to save as cuba-map2-west-to-east.svg
 
-** TODO Clarify CUBA2 itinerary with Marcel
+** DONE Clarify CUBA2 itinerary with Marcel
 Questions to ask:
 - Does CUBA2 start from Habana or directly from Viñales? : START AT HABANA, THEN VINALES ETC
 - Should Cienfuegos be included (between Playa Larga and Trinidad)?: YES
 - Is María la Gorda bidirectional route in CUBA2 or only CUBA1? DO NOT include MARIA LA GORDA in any of the itineraries
 
-** TODO Add routes to CUBA2 once itinerary confirmed
-Based on Marcel's email (pending clarification):
-- Viñales → Soroa → Playa Larga → (Cienfuegos?) → Trinidad
-- Trinidad → Camagüey → Santiago de Cuba → Baracoa
-- Baracoa ↔ Santiago de Cuba (bidirectional)
-- Santiago de Cuba → Habana (straight nightbus)
-- Optional: Baracoa → Faro de Maisi → Yumurí → Baracoa (circular loop)
+** DONE Add routes to CUBA2 once itinerary confirmed
+Based on Marcel's confirmed requirements:
+- [X] Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad (map2.js:247-269)
+- [X] Trinidad → Camagüey → Santiago de Cuba → Baracoa (map2.js:273-285)
+- [X] Baracoa ↔ Santiago de Cuba (bidirectional) (map2.js:288-290)
+- [X] Santiago de Cuba → Habana (straight nightbus, curvature=0) (map2.js:293-295)
+- [X] Optional: Baracoa → Faro de Maisi → Yumurí → Baracoa (circular loop) (map2.js:298-311)
 
 ** TODO Test all routes stay 100% inland
 Especially check the long Santiago de Cuba → Habana nightbus route
+
+** TODO CRITICAL: Fix coordinate/map projection mismatch
+*** Problem
+City markers are incorrectly positioned on the map. Many cities appear in the water instead of on land.
+
+Evidence: See Screenshots/CubaMap2.3.png
+- Santiago de Cuba appears in the sea (south coast)
+- Should be inland on the southeast coast
+
+*** Root Cause
+Mismatch between:
+1. GeoJSON coordinates (real lat/lng): Santiago = 20.0247°N, -75.8219°W
+2. SVG base map projection/coordinate system
+3. latLngToSVG() conversion function using incorrect bounds or formula
+
+*** Investigation needed
+- [ ] Verify cuba.svg projection type (Mercator? Equirectangular? Custom?)
+- [ ] Check actual SVG path data to find real Santiago position in cuba.svg
+- [ ] Calibrate CUBA_BOUNDS constants to match SVG projection
+- [ ] Test conversion with known accurate cities (Habana should be on north coast)
+- [ ] Adjust OFFSET values if needed
+
+*** Current conversion (map2.js:46-66)
+#+begin_src javascript
+const CUBA_BOUNDS = {
+  north: 23.4,
+  south: 19.6,
+  west: -85.2,
+  east: -73.9
+};
+const OFFSET = { x: 0, y: 40 };
+#+end_src
+
+May need different bounds or transformation formula.
+
+** TODO Refactor CUBA2 to reuse western routes from CUBA1
+*** Problem
+CUBA2 is redrawing routes for Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad even though these EXACT same routes already exist in CUBA1 (map.js).
+
+This violates DRY principle (Don't Repeat Yourself).
+
+*** Current situation
+- map.js (CUBA1): Has working routes with tested curvature values
+- map2.js (CUBA2): Duplicates the same route code with same curvature values
+
+*** Action items
+- [ ] Extract western route definitions into shared module or function
+- [ ] Import/reuse western routes in both map.js and map2.js
+- [ ] Keep only CUBA2-specific eastern routes in map2.js:
+  - Trinidad → Camagüey → Santiago de Cuba → Baracoa
+  - Baracoa ↔ Santiago de Cuba (bidirectional)
+  - Santiago de Cuba → Habana (nightbus)
+  - Optional eastern loop
+- [ ] Consider creating routes-config.js with route definitions
+
+*** Benefits
+- Single source of truth for western routes
+- Easier maintenance (change once, apply everywhere)
+- Reduced code duplication
+- Smaller bundle size
 
 * WAIT Update export functionality (2nd priority )
 Ensure SVG export works correctly with all new routes and cities 

@@ -91,6 +91,71 @@
         "type": "Point",
         "coordinates": [-84.50, 21.95]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Camagüey",
+        "type": "city",
+        "province": "Camagüey",
+        "notable": "colonial center, UNESCO"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.92, 21.38]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Santiago de Cuba",
+        "type": "city",
+        "province": "Santiago de Cuba",
+        "notable": "second city, revolutionary history"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-75.8219, 20.0247]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Baracoa",
+        "type": "town",
+        "province": "Guantánamo",
+        "notable": "oldest city, chocolate, nature"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.5024, 20.3475]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Faro de Maisi",
+        "type": "lighthouse",
+        "province": "Guantánamo",
+        "notable": "extreme east point of Cuba"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.1336, 20.2089]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Yumurí",
+        "type": "village",
+        "province": "Guantánamo",
+        "notable": "Boca de Yumurí, natural reserve"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.2976, 20.3009]
+      }
     }
   ]
 }

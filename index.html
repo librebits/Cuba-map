@@ -5,8 +5,13 @@
 		<title>Cuba Map </title>
 	</head>
 	<body>
+		<div style="margin: 10px;">
+			<label>Itinerary: </label>
+			<button id="cuba1-btn" style="margin-right: 10px; padding: 5px 15px;">CUBA1 (Western)</button>
+			<button id="cuba2-btn" style="margin-right: 10px; padding: 5px 15px;">CUBA2 (West to East)</button>
+			<button id="export-btn" style="padding: 5px 15px;">Export SVG</button>
+		</div>
 		<object data="cuba.svg?v=3" type="image/svg+xml" id="cuba-map"></object>
-		<button id="export-btn">Export SVG</button>
 		<script type="module" src="map.js"></script>
 	</body>
 	<footer>Made with FLOSS love</footer>

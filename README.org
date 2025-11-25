@@ -1,37 +1,128 @@
 * Itineraries
 
 ** CUBA1 (Western Route)
+*** Status: COMPLETED ✓
+*** Route
 Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad
 
-*Note:* María la Gorda removed per Marcel's request. No loop back to Habana.
+*** Notes
+- *María la Gorda removed* per Marcel's request (not included in any itinerary)
+- *No loop back to Habana* - route ends at Trinidad
+- All routes use curved paths staying 100% inland
+- Cities: 6 markers (Habana, Viñales, Soroa, Playa Larga, Cienfuegos, Trinidad)
+
+*** Files
+- =index.html= - Main HTML page
+- =map.js= - JavaScript implementation
+- =cuba.svg= - Base map (viewBox corrected to show full island)
+- =cuba-locations-geojson.json= - GeoJSON city data
+
+*** Access
+- Local file: =file:///home/fenix/Cuba-map/index.html=
+- Browser-sync: http://localhost:3000/index.html
 
 ** CUBA2 (West to East Cross-Country)
-Main route:
-- Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad
-- Trinidad → Camagüey → Santiago de Cuba → Baracoa
-- Baracoa ↔ Santiago de Cuba (bidirectional)
-- Santiago de Cuba → Habana (straight nightbus line)
+*** Status: IN PROGRESS (coordinate calibration needed)
+*** Route
+*Western segment (reuses CUBA1):*
+Habana → Viñales → Soroa → Playa Larga → Cienfuegos → Trinidad
 
-Optional eastern loop (anti-clockwise):
-- Baracoa → Faro de Maisi → Yumurí → Baracoa
+*Eastern extension (new):*
+Trinidad → Camagüey → Santiago de Cuba → Baracoa
 
+*Bidirectional:*
+Baracoa ↔ Santiago de Cuba (double arrows)
 
+*Return:*
+Santiago de Cuba → Habana (straight nightbus line)
 
+*Optional eastern loop:*
+Baracoa → Faro de Maisí → Yumurí → Baracoa (anti-clockwise circular)
 
-3 Cuba 
-11 x country
+*** Current Issues
+- [ ] Coordinate mapping needs calibration for eastern cities
+- [ ] Some cities appearing in water instead of on land
+- [ ] Testing routes to ensure 100% inland paths
 
+*** Cities
+11 markers total:
+- Western: Habana, Viñales, Soroa, Playa Larga, Cienfuegos, Trinidad
+- Eastern: Camagüey, Santiago de Cuba, Baracoa, Faro de Maisí, Yumurí
 
-* Inspiration : https://www.responsibletravel.com/
+*** Files
+- =index2.html= - Separate HTML page for CUBA2
+- =map2.js= - JavaScript implementation (needs refactoring to reuse CUBA1 routes)
+- =cuba.svg= - Same base map (shared with CUBA1)
+- =cuba-locations-geojson.json= - Extended GeoJSON with eastern cities
 
-
+*** Access
+- Local file: =file:///home/fenix/Cuba-map/index2.html=
+- Browser-sync: http://localhost:3000/index2.html
 * Project Structure
 
+```
 cuba-map/
-├── cuba.svg                        # Base SVG map of Cuba
-├── cuba-locations-geojson.json     # City coordinates (GeoJSON format)
-├── index.html                      # CUBA1 (Western route)
-├── map.js                          # CUBA1 JavaScript logic
-├── index2.html                     # CUBA2 (West to East route)
-├── map2.js                         # CUBA2 JavaScript logic
-└── Maps/                           # Exported SVG maps
+├── cuba.svg                      # Base SVG map (corrected viewBox for full island)
+├── cuba-locations-geojson.json   # City coordinates (GeoJSON format with lat/lng)
+├── index.html                    # CUBA1 (Western Route) page
+├── map.js                        # CUBA1 implementation
+├── index2.html                   # CUBA2 (West to East) page
+├── map2.js                       # CUBA2 implementation
+├── README.org                    # This file
+├── TODO.org                      # Task tracking
+├── CLAUDE.md                     # Project instructions for Claude Code
+└── Screenshots/                  # Visual documentation
+```
+
+* Development Setup
+
+** Browser-sync (auto-reload with Org Babel async)
+
+Start development server with async execution (non-blocking):
+
+#+begin_src bash :dir /home/fenix/Cuba-map :async
+npx browser-sync start --server --files "*.html,*.js,*.svg,*.json" --no-notify --port 3000
+#+end_src
+
+*** How to use
+1. Place cursor in code block above
+2. Press =C-c C-c= to execute
+3. Emacs remains responsive (async execution via =ob-async= package)
+4. Output appears in results block when ready
+
+*** Access URLs
+- CUBA1: http://localhost:3000/index.html
+- CUBA2: http://localhost:3000/index2.html
+- Dashboard: http://localhost:3001
+
+*** Features
+- ✅ Auto-reload on file save
+- ✅ Non-blocking (Emacs stays responsive)
+- ✅ Watches: =*.html=, =*.js=, =*.svg=, =*.json=
+- ✅ UI dashboard at port 3001
+
+*** Stop server
+- Find process: =ps aux | grep browser-sync=
+- Kill: =kill <PID>=
+- Or use: =M-x list-processes= → mark → =d= (delete)
+
+** Alternative: Terminal execution
+
+If you prefer external terminal:
+#+begin_src bash :dir /home/fenix/Cuba-map
+npx browser-sync start --server --files "*.html,*.js,*.svg,*.json" --no-notify --port 3000
+#+end_src
+
+Or use Emacs async shell command:
+- =M-&= (async-shell-command)
+- Type the command above
+- Output goes to =*Async Shell Command*= buffer
+
+** Manual testing
+Open files directly in browser or use =Ctrl+Shift+R= for hard reload.
+
+* Inspiration
+- https://www.responsibletravel.com/
+
+* Customer
+Marcel (via email requirements)
